@@ -3,6 +3,7 @@
 // ============================================================
 
 require('dotenv').config();
+const path = require('path');
 const cors = require('cors');
 const express = require('express');
 const http = require('http');
@@ -1339,6 +1340,17 @@ app.get(
     res.json({ data: result });
   })
 );
+
+if (IS_PRODUCTION) {
+  const distPath = path.join(__dirname, '..', 'dist');
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
 
 app.use((err, _req, res, next) => {
   if (!err) {
