@@ -1,0 +1,95 @@
+.root {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--got-border);
+  background: var(--got-surface-2);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.message {
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.action {
+  justify-self: start;
+  margin-top: var(--space-1);
+}
+
+.loading {
+  border-color: var(--got-border-gold);
+  background: rgba(232, 160, 32, 0.08);
+}
+
+.loading .title {
+  color: var(--got-gold);
+}
+
+.loading .message,
+.loading .icon {
+  color: var(--got-text-muted);
+}
+
+.empty {
+  border-color: var(--got-border);
+  background: var(--got-surface);
+}
+
+.empty .title {
+  color: var(--got-text-light);
+}
+
+.empty .message,
+.empty .icon {
+  color: var(--got-text-dim);
+}
+
+.error {
+  border-color: var(--got-red);
+  background: rgba(139, 26, 26, 0.12);
+}
+
+.error .title {
+  color: var(--got-red-light);
+}
+
+.error .message,
+.error .icon {
+  color: var(--got-text-muted);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

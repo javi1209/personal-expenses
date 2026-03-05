@@ -1,0 +1,207 @@
+@import './styles/tokens.css';
+
+/* ============================================================
+   GLOBAL RESET & BASE STYLES
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--got-dark);
+  color: var(--got-text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   TYPOGRAPHY UTILITIES
+   ============================================================ */
+
+.heading-1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--got-gold);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px rgba(201,168,76,0.3);
+}
+
+.heading-2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--got-gold);
+  letter-spacing: 0.04em;
+}
+
+.heading-3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--got-text-light);
+  letter-spacing: 0.03em;
+}
+
+.heading-4 {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--got-text-light);
+  letter-spacing: 0.02em;
+}
+
+.body-text {
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  color: var(--got-text);
+  line-height: 1.7;
+}
+
+.caption {
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  color: var(--got-text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.data-value {
+  font-family: var(--font-data);
+  font-weight: 600;
+  color: var(--got-text-light);
+}
+
+/* ============================================================
+   SCROLLBAR STYLING
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--got-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--got-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--got-gold-dim);
+}
+
+/* ============================================================
+   ORNAMENTAL DIVIDER
+   ============================================================ */
+
+.ornamental-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.ornamental-divider::before,
+.ornamental-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--got-border-gold), transparent);
+}
+
+.ornamental-divider span {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  color: var(--got-gold-dim);
+  letter-spacing: 0.1em;
+}
+
+/* ============================================================
+   GOLD ACCENT LINE
+   ============================================================ */
+
+.gold-line {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--got-gold), transparent);
+  border-radius: 1px;
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(201,168,76,0.2); }
+  50%       { box-shadow: 0 0 20px rgba(201,168,76,0.4); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.animate-slide-in {
+  animation: slideInLeft 0.3s ease forwards;
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+.text-gold   { color: var(--got-gold); }
+.text-muted  { color: var(--got-text-muted); }
+.text-red    { color: var(--got-red-light); }
+.text-green  { color: var(--got-green-light); }
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+.flex        { display: flex; }
+.flex-col    { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2       { gap: var(--space-2); }
+.gap-4       { gap: var(--space-4); }
+
+.w-full      { width: 100%; }
+.h-full      { height: 100%; }
+
+.mt-4        { margin-top: var(--space-4); }
+.mb-4        { margin-bottom: var(--space-4); }
+.p-4         { padding: var(--space-4); }
+
+/* Gold parchment background pattern */
+.parchment-bg {
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(139,26,26,0.03) 0%, transparent 50%);
+}

@@ -1,0 +1,325 @@
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--got-black);
+  border-right: 1px solid var(--got-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  transition: width var(--transition-base);
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: var(--sidebar-collapsed);
+}
+
+/* Top ornamental line */
+.sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--got-gold-dim) 20%,
+    var(--got-gold-dim) 80%,
+    transparent
+  );
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  border-bottom: 1px solid var(--got-border);
+  min-height: var(--header-height);
+  text-decoration: none;
+}
+
+.brandIcon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  color: var(--got-gold);
+}
+
+.brandText {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--got-gold);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.collapsed .brandText {
+  opacity: 0;
+}
+
+.nav {
+  flex: 1;
+  padding: var(--space-4) var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow-y: auto;
+}
+
+.navSection {
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-1);
+}
+
+.navSectionLabel {
+  font-family: var(--font-data);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--got-text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0 var(--space-3);
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.collapsed .navSectionLabel {
+  opacity: 0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--got-text-muted);
+  text-decoration: none;
+  font-family: var(--font-data);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  position: relative;
+}
+
+.navItem:hover {
+  background: var(--got-surface);
+  color: var(--got-text);
+}
+
+.navItem.active {
+  background: var(--got-gold-bg);
+  color: var(--got-gold);
+  border: 1px solid var(--got-border-gold);
+}
+
+.navItem.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--got-gold);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.navIcon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.navLabel {
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.collapsed .navLabel {
+  opacity: 0;
+  width: 0;
+}
+
+.alertBadge {
+  margin-left: auto;
+  background: var(--got-red);
+  color: white;
+  font-family: var(--font-data);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 999px;
+  min-width: 18px;
+  text-align: center;
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.collapsed .alertBadge {
+  opacity: 0;
+}
+
+.footer {
+  padding: var(--space-4) var(--space-3);
+  border-top: 1px solid var(--got-border);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.userBox {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--got-border);
+  background: var(--got-surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.userName {
+  font-family: var(--font-data);
+  color: var(--got-text-light);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.userEmail {
+  font-family: var(--font-data);
+  color: var(--got-text-dim);
+  font-size: 0.68rem;
+  margin-top: 2px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.settingsBox {
+  border: 1px solid var(--got-border);
+  background: var(--got-surface);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settingsTitle {
+  margin: 0;
+  font-family: var(--font-data);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--got-text-dim);
+}
+
+.settingsLabel {
+  display: grid;
+  gap: var(--space-1);
+  font-family: var(--font-data);
+  font-size: 0.68rem;
+  color: var(--got-text-muted);
+}
+
+.settingsSelect {
+  width: 100%;
+  border: 1px solid var(--got-border);
+  border-radius: var(--radius-sm);
+  background: var(--got-black);
+  color: var(--got-text-light);
+  font-family: var(--font-data);
+  font-size: 0.7rem;
+  padding: 0.28rem 0.4rem;
+  outline: none;
+}
+
+.settingsSelect:focus {
+  border-color: var(--got-gold-dim);
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: 1px solid var(--got-border);
+  border-radius: var(--radius-sm);
+  color: var(--got-text-muted);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.logoutBtn:hover {
+  border-color: var(--got-red-light);
+  color: var(--got-red-light);
+}
+
+.logoutLabel {
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.collapseBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border: 1px solid var(--got-border);
+  border-radius: var(--radius-sm);
+  color: var(--got-text-muted);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapseBtn:hover {
+  border-color: var(--got-gold-dim);
+  color: var(--got-gold);
+}
+
+.collapseBtnLabel {
+  opacity: 1;
+  transition: opacity var(--transition-fast);
+}
+
+.collapsed .collapseBtnLabel {
+  opacity: 0;
+  width: 0;
+}
+
+.collapsed .userBox,
+.collapsed .settingsBox,
+.collapsed .logoutLabel {
+  opacity: 0;
+  width: 0;
+  padding: 0;
+  border: 0;
+}

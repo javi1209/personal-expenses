@@ -1,0 +1,19 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-family: var(--font-data);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.gold    { background: var(--got-gold-bg);  color: var(--got-gold);       border-color: var(--got-gold-dim); }
+.red     { background: var(--got-red-bg);   color: var(--got-red-light);  border-color: var(--got-red); }
+.green   { background: var(--got-green-bg); color: var(--got-green-light); border-color: var(--got-green); }
+.muted   { background: var(--got-surface-2); color: var(--got-text-muted); border-color: var(--got-border); }
+.blue    { background: rgba(46,95,138,0.15); color: var(--got-blue-light); border-color: var(--got-blue); }
