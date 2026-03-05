@@ -114,6 +114,24 @@ El backend filtra todos los datos por `userId` del token JWT.
 - `npm run test:e2e:ui`: runner interactivo de Playwright
 - `npm run lint`: lint
 
+## Deploy en GitHub Pages
+
+Este repo ya incluye workflow en `.github/workflows/pages.yml`.
+
+Importante:
+- GitHub Pages sirve solo el frontend estatico.
+- El backend (Express + Mongo) debe estar desplegado aparte.
+
+### Pasos
+
+1. En GitHub, abre `Settings > Pages` y en `Build and deployment` selecciona `GitHub Actions`.
+2. En `Settings > Secrets and variables > Actions > Variables`, crea:
+   - `VITE_API_BASE_URL`: URL publica de tu API, por ejemplo `https://tu-backend.com/api`
+   - `VITE_SOCKET_URL`: URL publica base para Socket.IO, por ejemplo `https://tu-backend.com`
+3. Haz push a `main` o `master` (o ejecuta manualmente `Deploy Pages` desde `Actions`).
+
+El workflow construye `dist`, genera `dist/404.html` para rutas SPA y publica en Pages.
+
 ## Documentacion
 
 - Documentacion tecnica completa: [docs/arquitectura.md](docs/arquitectura.md)

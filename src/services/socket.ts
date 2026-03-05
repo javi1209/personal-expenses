@@ -1,5 +1,6 @@
 import { io, type Socket } from 'socket.io-client';
 import { TOKEN_STORAGE_KEY } from './api.ts';
+import { SOCKET_URL } from '../config/runtime.ts';
 
 let socket: Socket | null = null;
 let socketToken: string | null = null;
@@ -15,7 +16,7 @@ export const getSocket = (): Socket => {
       socket.disconnect();
       socket = null;
     }
-    socket = io('/', {
+    socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
       auth: token ? { token } : undefined,
       autoConnect: Boolean(token),

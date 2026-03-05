@@ -6,8 +6,7 @@ import {
   type Presupuesto,
   type Usuario,
 } from '../types/index.ts';
-
-const BASE_URL = '/api';
+import { API_BASE_URL } from '../config/runtime.ts';
 export const TOKEN_STORAGE_KEY = 'got_token';
 
 type EntityWithMongoId = { _id?: string; id?: string };
@@ -55,7 +54,7 @@ async function request<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = getStoredToken();
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',

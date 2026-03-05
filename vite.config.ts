@@ -3,7 +3,11 @@ import react from '@vitejs/plugin-react'
 import svgr from 'vite-plugin-svgr'
 import { VitePWA } from 'vite-plugin-pwa'
 
+const rawBasePath = process.env.VITE_BASE_PATH?.trim()
+const basePath = rawBasePath ? `${rawBasePath.replace(/\/+$/, '')}/` : '/'
+
 export default defineConfig({
+  base: basePath,
   plugins: [
     react(),
     svgr(),
@@ -18,7 +22,7 @@ export default defineConfig({
         background_color: '#100C08',
         display: 'standalone',
         icons: [
-          { src: '/crown.svg', sizes: 'any', type: 'image/svg+xml' }
+          { src: 'crown.svg', sizes: 'any', type: 'image/svg+xml' }
         ]
       }
     })

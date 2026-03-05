@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { API_BASE_URL } from '../config/runtime.ts';
+import { TOKEN_STORAGE_KEY } from '../services/api.ts';
 
 export const PREFERENCES_STORAGE_KEY = 'got_preferences';
 
@@ -99,7 +101,7 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
 
   syncWithBackend: async (token: string) => {
     try {
-      const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/user/settings`, {
+      const resp = await fetch(`${API_BASE_URL}/user/settings`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (resp.ok) {
@@ -119,11 +121,11 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
 
   updateBackend: async () => {
     const { locale, currency, theme } = get();
-    const token = localStorage.getItem('token'); // Assuming auth token is here
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY);
     if (!token) return;
 
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/user/settings`, {
+      await fetch(`${API_BASE_URL}/user/settings`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
