@@ -27,6 +27,7 @@ He reorganizado la lista por **Prioridad (P1 a P4)** para que tengas una guía c
 
 ### Completadas recientemente:
 
+- [X] **Despliegue Full-Stack (Vercel)**: Configuración de Serverless Functions y ruteo SPA para despliegue gratuito sin tarjeta.
 - [X] ~~**Datos y reportes reales**: Quitar datos hardcodeados de tendencia mensual y calcularlos desde datos reales.~~
 - [X] ~~**Gestión de Cuentas**: Manejo de múltiples billeteras con saldos reales y sincronización automática.~~
 - [X] ~~**Edición de Presupuestos**: Interfaz para ajustar montos y alertas de presupuestos existentes.~~
