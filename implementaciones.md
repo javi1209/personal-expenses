@@ -11,12 +11,12 @@ He reorganizado la lista por **Prioridad (P1 a P4)** para que tengas una guía c
 
 - [X] ~~**Automatización de Recurrentes**: Proceso en el backend que genera automáticamente los gastos marcados como `esRecurrente` al inicio de cada mes. Implementado con `RecurrenteLog` (idempotente), trigger al arrancar el servidor, endpoint `POST /api/admin/generar-recurrentes` con botón en la UI de Gastos.~~
 
-## [P3] Utilidad y Retención (Media)
+## [P3] Utilidad y Retención ✅ Completo
 
-- [ ] **Exportación de Datos**: Botón para descargar reportes en CSV o PDF para contabilidad personal fuera de la app.
-- [ ] **Búsqueda Global**: Buscador por descripción de gasto entre todos los meses disponibles.
-- [ ] **Filtros Avanzados**: Filtro por rango de montos (mínimo/máximo) en la lista de gastos.
-- [ ] **Notificaciones**: Avisos proactivos (Push o Email) cuando se registra un pago en un gasto compartido o cuando un presupuesto llega al 90%.
+- [x] **Exportación de Datos**: Botón para descargar reportes en CSV o PDF para contabilidad personal fuera de la app.
+- [x] **Búsqueda Global**: Buscador por descripción de gasto entre todos los meses disponibles.
+- [x] **Filtros Avanzados**: Filtro por rango de montos (mínimo/máximo) en la lista de gastos.
+- [x] **Notificaciones**: Avisos proactivos (Push o Email) cuando se registra un pago en un gasto compartido o cuando un presupuesto llega al 90%.
 
 ## [P4] Experiencia de Usuario y Pulido (Baja)
 
