@@ -4,7 +4,9 @@
    GLOBAL RESET & BASE STYLES
    ============================================================ */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -42,7 +44,7 @@ body {
   font-weight: 700;
   color: var(--got-gold);
   letter-spacing: 0.05em;
-  text-shadow: 0 0 20px rgba(201,168,76,0.3);
+  text-shadow: 0 0 20px rgba(201, 168, 76, 0.3);
 }
 
 .heading-2 {
@@ -98,13 +100,16 @@ body {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--got-black);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--got-border);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--got-gold-dim);
 }
@@ -152,19 +157,51 @@ body {
    ============================================================ */
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-16px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 8px rgba(201,168,76,0.2); }
-  50%       { box-shadow: 0 0 20px rgba(201,168,76,0.4); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(201, 168, 76, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.4);
+  }
 }
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease forwards;
@@ -178,30 +215,77 @@ body {
    UTILITY CLASSES
    ============================================================ */
 
-.text-gold   { color: var(--got-gold); }
-.text-muted  { color: var(--got-text-muted); }
-.text-red    { color: var(--got-red-light); }
-.text-green  { color: var(--got-green-light); }
-.text-center { text-align: center; }
-.text-right  { text-align: right; }
+.text-gold {
+  color: var(--got-gold);
+}
 
-.flex        { display: flex; }
-.flex-col    { flex-direction: column; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.gap-2       { gap: var(--space-2); }
-.gap-4       { gap: var(--space-4); }
+.text-muted {
+  color: var(--got-text-muted);
+}
 
-.w-full      { width: 100%; }
-.h-full      { height: 100%; }
+.text-red {
+  color: var(--got-red-light);
+}
 
-.mt-4        { margin-top: var(--space-4); }
-.mb-4        { margin-bottom: var(--space-4); }
-.p-4         { padding: var(--space-4); }
+.text-green {
+  color: var(--got-green-light);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: var(--space-2);
+}
+
+.gap-4 {
+  gap: var(--space-4);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.mt-4 {
+  margin-top: var(--space-4);
+}
+
+.mb-4 {
+  margin-bottom: var(--space-4);
+}
+
+.p-4 {
+  padding: var(--space-4);
+}
 
 /* Gold parchment background pattern */
 .parchment-bg {
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.03) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(139,26,26,0.03) 0%, transparent 50%);
+    radial-gradient(ellipse at 20% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(139, 26, 26, 0.03) 0%, transparent 50%);
 }

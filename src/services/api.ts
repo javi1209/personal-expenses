@@ -213,3 +213,53 @@ export const reportesApi = {
   getTendencia: (months?: number): Promise<ApiResponse<{ mes: string; Gastos: number; Presupuesto: number }[]>> =>
     request<ApiResponse<{ mes: string; Gastos: number; Presupuesto: number }[]>>(`/reportes/tendencia${months ? `?months=${months}` : ''}`),
 };
+
+// --- Admin (Recurrentes) ---
+export interface RecurrenteResult {
+  generados: number;
+  mes: string;
+  yaGenerado: boolean;
+}
+
+export interface RecurrenteLogEntry {
+  _id: string;
+  mes: string;
+  generados: number;
+  createdAt: string;
+}
+
+export const adminApi = {
+  generarRecurrentes: (): Promise<ApiResponse<RecurrenteResult>> =>
+    request<ApiResponse<RecurrenteResult>>('/admin/generar-recurrentes', { method: 'POST' }),
+
+  getRecurrentesLog: (): Promise<ApiResponse<RecurrenteLogEntry[]>> =>
+    request<ApiResponse<RecurrenteLogEntry[]>>('/admin/recurrentes-log'),
+};
+
+// --- Alertas ---
+export interface Alerta {
+  id: string;
+  userId: string;
+  tipo: 'presupuesto' | 'compartido' | 'sistema';
+  titulo: string;
+  mensaje: string;
+  leida: boolean;
+  referenciaId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const alertasApi = {
+  getAll: async (): Promise<ApiResponse<Alerta[]>> => {
+    const res = await request<ApiResponse<Alerta[]>>('/alertas');
+    return { ...res, data: normalizeEntityList(res.data as EntityWithMongoId[]) as unknown as Alerta[] };
+  },
+
+  marcarLeida: async (id: string): Promise<ApiResponse<Alerta>> => {
+    const res = await request<ApiResponse<Alerta>>(`/alertas/${id}/leer`, { method: 'PUT' });
+    return { ...res, data: normalizeEntity(res.data as EntityWithMongoId) as unknown as Alerta };
+  },
+
+  marcarTodasLeidas: (): Promise<ApiResponse<{ message: string }>> =>
+    request<ApiResponse<{ message: string }>>('/alertas/leer-todas', { method: 'PUT' }),
+};

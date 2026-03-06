@@ -91,3 +91,50 @@
   --sidebar-collapsed:   64px;
   --header-height:       60px;
 }
+
+:root.light-theme {
+  /* --- Backgrounds --- */
+  --got-black:       #f4efe4;
+  --got-dark:        #eee6d8;
+  --got-surface:     #fbf8f1;
+  --got-surface-2:   #f1e9da;
+  --got-surface-3:   #e6dccb;
+
+  /* --- Borders --- */
+  --got-border:      #d7c9b2;
+  --got-border-dim:  #e2d6c2;
+  --got-border-gold: #b08b3b;
+
+  /* --- Gold (Lannister) --- */
+  --got-gold:        #8a6a22;
+  --got-gold-light:  #a27d2b;
+  --got-gold-dim:    #9a7a33;
+  --got-gold-bg:     #f3e9d0;
+
+  /* --- Red (Blood / Fire) --- */
+  --got-red:         #8a2c2c;
+  --got-red-light:   #a83e3e;
+  --got-red-bg:      #f6e6e6;
+
+  /* --- Green (Subtle success) --- */
+  --got-green:       #2c6a48;
+  --got-green-light: #2f7a51;
+  --got-green-bg:    #e5f1ea;
+
+  /* --- Blue (Info / water) --- */
+  --got-blue:        #2b5f8a;
+  --got-blue-light:  #3578ad;
+
+  /* --- Text --- */
+  --got-text:        #3c2f22;
+  --got-text-light:  #241b12;
+  --got-text-muted:  #6f604d;
+  --got-text-dim:    #988974;
+
+  /* --- Shadows --- */
+  --shadow-sm:   0 1px 3px rgba(35, 20, 8, 0.08);
+  --shadow-md:   0 4px 16px rgba(35, 20, 8, 0.12);
+  --shadow-lg:   0 8px 32px rgba(35, 20, 8, 0.16);
+  --shadow-gold: 0 0 12px rgba(138, 106, 34, 0.2);
+  --shadow-red:  0 0 12px rgba(138, 44, 44, 0.18);
+}

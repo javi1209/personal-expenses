@@ -24,6 +24,13 @@ export const useGastosStore = create<GastosState>((set, get) => ({
   error: null,
   filtroCategoria: 'todas',
   filtroMes: format(new Date(), 'yyyy-MM'),
+  searchQuery: '',
+  montoMin: null,
+  montoMax: null,
+
+  setSearchQuery: (q) => set({ searchQuery: q }),
+  setMontoMin: (val) => set({ montoMin: val }),
+  setMontoMax: (val) => set({ montoMax: val }),
 
   loadGastos: async () => {
     set({ loading: true, error: null });
@@ -96,12 +103,23 @@ export const useGastosStore = create<GastosState>((set, get) => ({
   setFiltroMes: (mes) => set({ filtroMes: mes }),
 
   getGastosFiltrados: () => {
-    const { gastos, filtroCategoria, filtroMes } = get();
+    const { gastos, filtroCategoria, filtroMes, searchQuery, montoMin, montoMax } = get();
+    const query = searchQuery.trim().toLowerCase();
+
     return gastos.filter((g) => {
       const mesGasto = g.fecha.slice(0, 7);
-      const matchMes = mesGasto === filtroMes;
+      const matchMes = filtroMes === 'todos' || mesGasto === filtroMes;
       const matchCat = filtroCategoria === 'todas' || g.categoria === filtroCategoria;
-      return matchMes && matchCat;
+
+      const matchSearch = !query ||
+        g.descripcion.toLowerCase().includes(query) ||
+        (g.notas && g.notas.toLowerCase().includes(query)) ||
+        g.categoriaLabel.toLowerCase().includes(query);
+
+      const matchMin = montoMin === null || g.monto >= montoMin;
+      const matchMax = montoMax === null || g.monto <= montoMax;
+
+      return matchMes && matchCat && matchSearch && matchMin && matchMax;
     });
   },
 

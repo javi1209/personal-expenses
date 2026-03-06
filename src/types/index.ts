@@ -133,12 +133,18 @@ export interface GastosState {
   error: string | null;
   filtroCategoria: CategoriaType | 'todas';
   filtroMes: string;
+  searchQuery: string;
+  montoMin: number | null;
+  montoMax: number | null;
   loadGastos: () => Promise<void>;
   addGasto: (gasto: Omit<Gasto, 'id'>) => Promise<void>;
   updateGasto: (id: string, gasto: Partial<Gasto>) => Promise<void>;
   deleteGasto: (id: string) => Promise<void>;
   setFiltroCategoria: (cat: CategoriaType | 'todas') => void;
   setFiltroMes: (mes: string) => void;
+  setSearchQuery: (query: string) => void;
+  setMontoMin: (val: number | null) => void;
+  setMontoMax: (val: number | null) => void;
   getGastosFiltrados: () => Gasto[];
   getTotalMes: () => number;
 }

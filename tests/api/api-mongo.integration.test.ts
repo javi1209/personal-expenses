@@ -181,3 +181,108 @@ describe('API integration with mongodb-memory-server', () => {
       .expect(400);
   });
 });
+
+describe('Recurrentes: generación automática mensual', () => {
+  it('genera copias de gastos recurrentes del mes anterior', async () => {
+    const { token } = await createSession('recurrentes-gen');
+
+    // Crear gasto recurrente en el "mes anterior" (2026-02)
+    await request
+      .post('/api/gastos')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        ...gastoPayload('Alquiler mensual'),
+        esRecurrente: true,
+        fecha: '2026-02-15',
+      })
+      .expect(200);
+
+    // Crear gasto NO recurrente — no debe copiarse
+    await request
+      .post('/api/gastos')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        ...gastoPayload('Compra puntual'),
+        esRecurrente: false,
+        fecha: '2026-02-20',
+      })
+      .expect(200);
+
+    // Llamar al endpoint de generación para 2026-03
+    const genRes = await request
+      .post('/api/admin/generar-recurrentes')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(genRes.body.data).toMatchObject({
+      generados: 1,
+      mes: '2026-03',
+      yaGenerado: false,
+    });
+
+    // Verificar que la copia tiene la fecha del mes actual y sigue siendo recurrente
+    const listRes = await request
+      .get('/api/gastos')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const copia = (listRes.body.data as { descripcion: string; esRecurrente: boolean; fecha: string }[]).find(
+      (g) => g.descripcion === 'Alquiler mensual' && g.fecha === '2026-03-01'
+    );
+    expect(copia).toBeDefined();
+    expect(copia?.esRecurrente).toBe(true);
+  });
+
+  it('es idempotente: no duplica al llamar dos veces en el mismo mes', async () => {
+    const { token } = await createSession('recurrentes-idem');
+
+    await request
+      .post('/api/gastos')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...gastoPayload('Seguro auto'), esRecurrente: true, fecha: '2026-02-10' })
+      .expect(200);
+
+    // Primera llamada
+    await request
+      .post('/api/admin/generar-recurrentes')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    // Segunda llamada — debe devolver yaGenerado: true
+    const segundaRes = await request
+      .post('/api/admin/generar-recurrentes')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(segundaRes.body.data.yaGenerado).toBe(true);
+  });
+
+  it('devuelve 401 sin token de autenticación', async () => {
+    await request.post('/api/admin/generar-recurrentes').expect(401);
+    await request.get('/api/admin/recurrentes-log').expect(401);
+  });
+
+  it('devuelve el log de ejecuciones previas', async () => {
+    const { token } = await createSession('recurrentes-log');
+
+    await request
+      .post('/api/gastos')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ ...gastoPayload('Netflix'), esRecurrente: true, fecha: '2026-02-01' })
+      .expect(200);
+
+    await request
+      .post('/api/admin/generar-recurrentes')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    const logRes = await request
+      .get('/api/admin/recurrentes-log')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(Array.isArray(logRes.body.data)).toBe(true);
+    expect(logRes.body.data.length).toBeGreaterThanOrEqual(1);
+    expect(logRes.body.data[0]).toMatchObject({ mes: '2026-03' });
+  });
+});

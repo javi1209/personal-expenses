@@ -9,8 +9,10 @@ import { useAuthStore } from '../../store/authStore.ts';
 import {
   CURRENCY_OPTIONS,
   LOCALE_OPTIONS,
+  THEME_OPTIONS,
   type AppCurrency,
   type AppLocale,
+  type AppTheme,
   usePreferencesStore,
 } from '../../store/preferencesStore.ts';
 import styles from './Sidebar.module.css';
@@ -34,8 +36,10 @@ export function Sidebar() {
   const logout = useAuthStore((s) => s.logout);
   const locale = usePreferencesStore((s) => s.locale);
   const currency = usePreferencesStore((s) => s.currency);
+  const theme = usePreferencesStore((s) => s.theme);
   const setLocale = usePreferencesStore((s) => s.setLocale);
   const setCurrency = usePreferencesStore((s) => s.setCurrency);
+  const setTheme = usePreferencesStore((s) => s.setTheme);
 
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
@@ -102,6 +106,21 @@ export function Sidebar() {
               aria-label="Configurar moneda"
             >
               {CURRENCY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={styles.settingsLabel}>
+            Tema
+            <select
+              className={styles.settingsSelect}
+              value={theme}
+              onChange={(event) => setTheme(event.target.value as AppTheme)}
+              aria-label="Configurar tema"
+            >
+              {THEME_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>

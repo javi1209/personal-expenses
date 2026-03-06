@@ -276,13 +276,37 @@ const CuentaSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const RecurrenteLogSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    mes: { type: String, required: true }, // 'YYYY-MM'
+    generados: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
+RecurrenteLogSchema.index({ userId: 1, mes: 1 }, { unique: true });
+
 const User = mongoose.models.User ?? mongoose.model('User', UserSchema);
 const Gasto = mongoose.models.Gasto ?? mongoose.model('Gasto', GastoSchema);
 const GastoCompartido =
   mongoose.models.GastoCompartido ?? mongoose.model('GastoCompartido', GastoCompartidoSchema);
 const Presupuesto = mongoose.models.Presupuesto ?? mongoose.model('Presupuesto', PresupuestoSchema);
 const Cuenta = mongoose.models.Cuenta ?? mongoose.model('Cuenta', CuentaSchema);
+const RecurrenteLog = mongoose.models.RecurrenteLog ?? mongoose.model('RecurrenteLog', RecurrenteLogSchema);
 
+const AlertaSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    tipo: { type: String, enum: ['presupuesto', 'compartido', 'sistema'], required: true },
+    titulo: { type: String, required: true },
+    mensaje: { type: String, required: true },
+    leida: { type: Boolean, default: false },
+    referenciaId: { type: String }, // ID del presupuesto o del gasto compartido para evitar spans
+  },
+  { timestamps: true }
+);
+
+const Alerta = mongoose.models.Alerta ?? mongoose.model('Alerta', AlertaSchema);
 const ALLOWED_CATEGORIAS = new Set([
   'alimentacion',
   'transporte',
@@ -594,7 +618,54 @@ const extractSocketToken = (socket) => {
 };
 
 const toCategoriaLabel = (categoria) => CATEGORIA_META[categoria]?.label ?? categoria;
-const toCategoriaColor = (categoria) => CATEGORIA_META[categoria]?.color ?? '#94a3b8';
+const toCategoriaColor = (categoria) => CATEGORIA_META[categoria]?.color ?? CATEGORIA_META.otros.color;
+
+/**
+ * Crea una alerta de sistema y la emite al cliente conectado.
+ */
+const createAlerta = async (userId, payload) => {
+  const alerta = await Alerta.create({ ...payload, userId });
+  io.to(toUserRoom(userId)).emit('alerta:nueva', {
+    ...alerta.toObject(),
+    id: alerta._id.toString(),
+  });
+  return alerta;
+};
+
+/**
+ * Verifica si el gasto actual en una categoría supera el umbral del presupuesto.
+ * Si es así, crea una alerta (evitando spam comprobando si ya existe una alerta no leída
+ * reciente para esta categoría).
+ */
+const checkPresupuestoAlerta = async (userId, categoria) => {
+  const presupuesto = await Presupuesto.findOne({ userId, categoria });
+  if (!presupuesto || !presupuesto.montoLimite || presupuesto.montoLimite <= 0) return;
+
+  const umbral = presupuesto.alertaUmbral || 80;
+  const porcentaje = (presupuesto.montoGastado / presupuesto.montoLimite) * 100;
+
+  if (porcentaje >= umbral) {
+    // Verificar si ya emitimos una alerta para este presupuesto en los últimos 7 días
+    const septimoDia = new Date();
+    septimoDia.setDate(septimoDia.getDate() - 7);
+
+    const reciente = await Alerta.findOne({
+      userId,
+      tipo: 'presupuesto',
+      referenciaId: presupuesto._id.toString(),
+      createdAt: { $gte: septimoDia },
+    });
+
+    if (!reciente) {
+      await createAlerta(userId, {
+        tipo: 'presupuesto',
+        titulo: 'Alerta de Presupuesto',
+        mensaje: `Has alcanzado el ${porcentaje.toFixed(1)}% de tu presupuesto para ${presupuesto.categoriaLabel}.`,
+        referenciaId: presupuesto._id.toString(),
+      });
+    }
+  }
+};
 
 const deriveEstadoCompartido = (participantes) => {
   const todosPagaron = participantes.every((p) => p.pagado);
@@ -885,11 +956,9 @@ const sanitizePresupuestoPayload = (body, options = {}) => {
 };
 
 const getSpentForCategoria = async (categoria, userId) => {
-  const normalized = normalizeCategoria(categoria);
-  if (!normalized) return 0;
-
+  const objectUserId = new mongoose.Types.ObjectId(userId);
   const [result] = await Gasto.aggregate([
-    { $match: { categoria: normalized, userId: new mongoose.Types.ObjectId(userId) } },
+    { $match: { categoria: normalizeCategoria(categoria), userId: objectUserId } },
     { $group: { _id: null, total: { $sum: '$monto' } } },
   ]);
   return result?.total ?? 0;
@@ -905,6 +974,7 @@ const syncPresupuestoSpentForCategorias = async (userId, categorias) => {
     targets.map(async (categoria) => {
       const montoGastado = await getSpentForCategoria(categoria, userId);
       await Presupuesto.updateMany({ userId, categoria }, { $set: { montoGastado } });
+      await checkPresupuestoAlerta(userId, categoria); // Comprobar si disparar alerta
     })
   );
 };
@@ -1066,6 +1136,7 @@ app.post(
     const gasto = await Gasto.create({ ...payload, userId });
     await syncPresupuestoSpentForCategorias(userId, [gasto.categoria]);
     await syncCuentaBalance(userId, gasto.cuentaId);
+    await checkPresupuestoAlerta(userId, gasto.categoria);
     res.json({ data: toClientDoc(gasto) });
   })
 );
@@ -1091,6 +1162,7 @@ app.put(
     if (String(cuentaIdAnterior) !== String(gasto.cuentaId)) {
       await syncCuentaBalance(userId, gasto.cuentaId);
     }
+    await checkPresupuestoAlerta(userId, gasto.categoria);
 
     res.json({ data: toClientDoc(gasto) });
   })
@@ -1108,6 +1180,7 @@ app.delete(
     }
     await syncPresupuestoSpentForCategorias(userId, [deleted.categoria]);
     await syncCuentaBalance(userId, deleted.cuentaId);
+    await checkPresupuestoAlerta(userId, deleted.categoria);
     res.json({ message: 'Eliminado' });
   })
 );
@@ -1166,6 +1239,17 @@ app.post(
     gasto.estado = deriveEstadoCompartido(gasto.participantes);
     await gasto.save();
 
+    // Notificar al dueño de la cuenta que alguien pagó
+    if (gasto.userId.toString() === userId.toString()) {
+      // (si el que marca como pagado es el mismo back, es autogestión, pero simularemos la alerta)
+      await createAlerta(gasto.userId, {
+        tipo: 'compartido',
+        titulo: 'Pago recibido',
+        mensaje: `${participante} ha saldado su parte de "${gasto.descripcion}".`,
+        referenciaId: gasto._id.toString(),
+      });
+    }
+
     const payload = toClientDoc(gasto);
     io.to(toUserRoom(userId)).emit('gasto_compartido:participante_pagado', {
       gastoId: payload.id,
@@ -1185,6 +1269,46 @@ app.get(
   })
 );
 
+// --- Routes: Alertas ---
+app.get(
+  '/api/alertas',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    const data = await Alerta.find({ userId }).sort({ createdAt: -1 }).limit(50);
+    res.json({ data: toClientList(data) });
+  })
+);
+
+app.put(
+  '/api/alertas/:id/leer',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    ensureObjectId(req.params.id, 'id');
+    const alerta = await Alerta.findOneAndUpdate(
+      { _id: req.params.id, userId },
+      { $set: { leida: true } },
+      { new: true }
+    );
+    if (!alerta) {
+      res.status(404).json({ message: 'Alerta no encontrada' });
+      return;
+    }
+    res.json({ data: toClientDoc(alerta) });
+  })
+);
+
+app.put(
+  '/api/alertas/leer-todas',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    await Alerta.updateMany(
+      { userId, leida: false },
+      { $set: { leida: true } }
+    );
+    res.json({ message: 'Todas las alertas marcadas como leidas' });
+  })
+);
+
 app.post(
   '/api/presupuestos',
   asyncRoute(async (req, res) => {
@@ -1198,6 +1322,7 @@ app.post(
       categoria,
       montoGastado,
     });
+    await checkPresupuestoAlerta(userId, categoria);
     res.json({ data: toClientDoc(presupuesto) });
   })
 );
@@ -1392,6 +1517,123 @@ io.on('connection', (socket) => {
   });
 });
 
+// --- Recurrentes: Helpers ---
+
+const getMesActual = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+};
+
+const getMesAnterior = (mes) => {
+  const [year, month] = mes.split('-').map(Number);
+  const date = new Date(year, month - 1, 1);
+  date.setMonth(date.getMonth() - 1);
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+};
+
+/**
+ * Genera copias de los gastos recurrentes del mes anterior para el usuario.
+ * Es idempotente: si ya se generaron para ese mes, no hace nada.
+ * @returns {{ generados: number, mes: string, yaGenerado: boolean }}
+ */
+const generarRecurrentesParaUsuario = async (userId, mesObjetivo) => {
+  const mes = mesObjetivo ?? getMesActual();
+  const objectUserId = new mongoose.Types.ObjectId(userId);
+
+  // Idempotencia: verificar si ya se generó para este mes
+  const logExistente = await RecurrenteLog.findOne({ userId: objectUserId, mes });
+  if (logExistente) {
+    return { generados: logExistente.generados, mes, yaGenerado: true };
+  }
+
+  // Buscar gastos recurrentes del mes anterior
+  const mesAnterior = getMesAnterior(mes);
+  const gastosRecurrentes = await Gasto.find({
+    userId: objectUserId,
+    esRecurrente: true,
+    fecha: { $regex: `^${mesAnterior}` },
+  }).lean();
+
+  if (gastosRecurrentes.length === 0) {
+    // Registrar ejecución con 0 generados (evitar re-búsqueda innecesaria)
+    await RecurrenteLog.create({ userId: objectUserId, mes, generados: 0 });
+    return { generados: 0, mes, yaGenerado: false };
+  }
+
+  // Crear copias con fecha al día 1 del mes objetivo
+  const copias = gastosRecurrentes.map(({ _id, createdAt, updatedAt, ...gasto }) => ({
+    ...gasto,
+    fecha: `${mes}-01`,
+    cuentaVence: '', // No heredar vencimientos pasados
+  }));
+
+  await Gasto.insertMany(copias);
+
+  // Sincronizar presupuestos y cuentas afectadas
+  const categoriasAfectadas = [...new Set(gastosRecurrentes.map((g) => g.categoria))];
+  await syncPresupuestoSpentForCategorias(String(userId), categoriasAfectadas);
+  const cuentasAfectadas = [...new Set(gastosRecurrentes.map((g) => g.cuentaId).filter(Boolean))];
+  await Promise.all(cuentasAfectadas.map((cuentaId) => syncCuentaBalance(String(userId), cuentaId)));
+
+  // Registrar ejecución exitosa
+  await RecurrenteLog.create({ userId: objectUserId, mes, generados: copias.length });
+
+  logger.info('[Recurrentes] Gastos generados', { userId: String(userId), mes, cantidad: copias.length });
+  return { generados: copias.length, mes, yaGenerado: false };
+};
+
+/**
+ * Genera recurrentes para todos los usuarios al arrancar el servidor.
+ * Solo actúa durante la ventana de los primeros 5 días del mes.
+ */
+const generarRecurrentesOnBoot = async () => {
+  const hoy = new Date().getDate();
+  if (hoy > 5) return; // Fuera de ventana de generación
+
+  try {
+    const userIds = await Gasto.distinct('userId', { esRecurrente: true });
+    if (userIds.length === 0) return;
+
+    const mes = getMesActual();
+    const resultados = await Promise.all(
+      userIds.map((userId) => generarRecurrentesParaUsuario(String(userId), mes))
+    );
+    const totalGenerados = resultados.reduce((sum, r) => sum + r.generados, 0);
+    logger.info('[Recurrentes] Boot completado', { usuarios: userIds.length, totalGenerados });
+  } catch (err) {
+    logger.error('[Recurrentes] Error en boot', err);
+  }
+};
+
+// --- Routes: Admin (Recurrentes) ---
+app.post(
+  '/api/admin/generar-recurrentes',
+  requireAuth,
+  asyncRoute(async (req, res) => {
+    const { userId } = req.auth;
+    const mes = getMesActual();
+    const resultado = await generarRecurrentesParaUsuario(userId, mes);
+    res.json({ data: resultado });
+  })
+);
+
+app.get(
+  '/api/admin/recurrentes-log',
+  requireAuth,
+  asyncRoute(async (req, res) => {
+    const { userId } = req.auth;
+    const logs = await RecurrenteLog.find({ userId: new mongoose.Types.ObjectId(userId) })
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .lean();
+    res.json({ data: logs });
+  })
+);
+
 const syncPresupuestosOnBoot = async () => {
   try {
     const userIds = await Presupuesto.distinct('userId');
@@ -1402,6 +1644,7 @@ const syncPresupuestosOnBoot = async () => {
     console.error('[DB] Error sincronizando presupuestos:', msg);
   }
 };
+
 
 const connectDatabase = async (mongoUri = MONGO) => {
   if (mongoose.connection.readyState === 1) return mongoose.connection;
@@ -1461,6 +1704,7 @@ const startServer = async (options = {}) => {
     dbConnected = true;
     console.log('[DB] MongoDB conectado');
     await syncPresupuestosOnBoot();
+    await generarRecurrentesOnBoot();
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Error desconocido';
     console.error('[DB] Error conectando MongoDB:', msg);
@@ -1492,7 +1736,12 @@ module.exports = {
     Gasto,
     GastoCompartido,
     Presupuesto,
+    RecurrenteLog,
+    Alerta,
   },
+  generarRecurrentesParaUsuario,
+  getMesActual,
+  getMesAnterior,
   connectDatabase,
   disconnectDatabase,
   startServer,

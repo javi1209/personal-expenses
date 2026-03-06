@@ -80,4 +80,17 @@ describe('preferencesStore integration', () => {
       })
     );
   });
+
+  it('setTheme aplica clase del tema y persiste en localStorage', () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    usePreferencesStore.getState().setTheme('light');
+    expect(document.documentElement.classList.contains('light-theme')).toBe(true);
+
+    const raw = localStorage.getItem(PREFERENCES_STORAGE_KEY);
+    expect(raw).not.toBeNull();
+    expect(JSON.parse(raw ?? '{}')).toMatchObject({ theme: 'light' });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

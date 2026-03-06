@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Clock, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Clock, Download, Pencil, Plus, RefreshCw, Search, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Header } from '../components/layout/Header.tsx';
 import { GastoForm } from '../components/gastos/GastoForm.tsx';
@@ -11,6 +11,7 @@ import { ErrorState } from '../components/ui/ErrorState.tsx';
 import { Modal } from '../components/ui/Modal.tsx';
 import { useFormatting } from '../hooks/useFormatting.ts';
 import { CATEGORIAS, CATEGORIA_COLORS } from '../data/mockData.ts';
+import { adminApi } from '../services/api.ts';
 import { useGastosStore } from '../store/gastosStore.ts';
 import { type CategoriaType, type Gasto } from '../types/index.ts';
 import styles from './Gastos.module.css';
@@ -38,6 +39,8 @@ const BASE_MONTH_OPTIONS = buildMonthOptions(MONTH_OPTIONS_COUNT);
 export function Gastos() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Gasto | undefined>(undefined);
+  const [recurrenteLoading, setRecurrenteLoading] = useState(false);
+  const [recurrenteMsg, setRecurrenteMsg] = useState<string | null>(null);
   const { formatCurrency, formatDate, formatMonthLabel } = useFormatting();
 
   const {
@@ -46,13 +49,43 @@ export function Gastos() {
     gastos: allGastos,
     filtroCategoria,
     filtroMes,
+    searchQuery,
+    montoMin,
+    montoMax,
     setFiltroCategoria,
     setFiltroMes,
+    setSearchQuery,
+    setMontoMin,
+    setMontoMax,
     getTotalMes,
     loadGastos,
     error,
     loading,
   } = useGastosStore();
+
+  const tieneRecurrentes = allGastos.some((g) => g.esRecurrente);
+
+  const handleGenerarRecurrentes = async () => {
+    setRecurrenteLoading(true);
+    setRecurrenteMsg(null);
+    try {
+      const { data } = await adminApi.generarRecurrentes();
+      if (data.yaGenerado) {
+        setRecurrenteMsg(`✓ Ya estaban generados para ${data.mes}`);
+      } else if (data.generados === 0) {
+        setRecurrenteMsg(`Sin recurrentes del mes anterior para copiar`);
+      } else {
+        setRecurrenteMsg(`✓ ${data.generados} gasto${data.generados !== 1 ? 's' : ''} generado${data.generados !== 1 ? 's' : ''} para ${data.mes}`);
+        toast.success(`${data.generados} recurrentes generados para ${data.mes}`);
+        await loadGastos();
+      }
+    } catch {
+      setRecurrenteMsg('Error al generar recurrentes');
+      toast.error('No se pudieron generar los recurrentes');
+    } finally {
+      setRecurrenteLoading(false);
+    }
+  };
 
   const gastos = getGastosFiltrados();
   const total = getTotalMes();
@@ -82,6 +115,36 @@ export function Gastos() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (gastos.length === 0) {
+      toast.error('No hay gastos para exportar');
+      return;
+    }
+
+    const headers = ['Fecha', 'Descripción', 'Categoría', 'Monto', 'Recurrente', 'Notas'];
+    const rows = gastos.map((g) => [
+      g.fecha,
+      `"${g.descripcion.replace(/"/g, '""')}"`,
+      `"${g.categoriaLabel.replace(/"/g, '""')}"`,
+      g.monto.toString(),
+      g.esRecurrente ? 'Sí' : 'No',
+      `"${(g.notas || '').replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `gastos_export_${filtroMes}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success('Exportación completada');
+  };
+
   const handleEdit = (gasto: Gasto) => {
     setEditing(gasto);
     setModalOpen(true);
@@ -98,13 +161,58 @@ export function Gastos() {
     <>
       <Header title="Registro de Gastos" subtitle="Todos los tributos del reino" />
 
-      <div className={styles.toolbar}>
-        <div className={styles.filters}>
+      {tieneRecurrentes && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-3)',
+          padding: 'var(--space-3) var(--space-4)',
+          marginBottom: 'var(--space-2)',
+          background: 'var(--got-surface)',
+          border: '1px solid var(--got-border)',
+          borderRadius: 'var(--radius-md)',
+          flexWrap: 'wrap',
+        }}>
+          <RefreshCw size={14} style={{ color: 'var(--got-gold)', flexShrink: 0 }} />
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--got-text-muted)', flex: 1 }}>
+            {recurrenteMsg ?? 'Tenés gastos recurrentes. Generálos al inicio de cada mes con un clic.'}
+          </span>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => void handleGenerarRecurrentes()}
+            disabled={recurrenteLoading}
+          >
+            {recurrenteLoading ? <RefreshCw size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <RefreshCw size={13} />}
+            {recurrenteLoading ? 'Generando...' : 'Generar recurrentes'}
+          </Button>
+        </div>
+      )}
+
+      <div className={styles.toolbar} style={{ flexWrap: 'wrap' }}>
+        <div className={styles.filters} style={{ width: '100%', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: '1 1 200px' }}>
+            <Search
+              size={16}
+              style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--got-text-muted)' }}
+            />
+            <input
+              type="text"
+              placeholder="Buscar gasto por desc..."
+              className={styles.filterSelect}
+              style={{ paddingLeft: 36, width: '100%', boxSizing: 'border-box' }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
           <select
             className={styles.filterSelect}
             value={filtroMes}
             onChange={(e) => setFiltroMes(e.target.value)}
+            style={{ flex: '1 1 140px' }}
           >
+            <option value="todos">Todos los meses</option>
             {mesesDisponibles.map((mes) => (
               <option key={mes} value={mes}>
                 {formatMonthLabel(mes, { month: 'long', year: 'numeric' })}
@@ -116,19 +224,45 @@ export function Gastos() {
             className={styles.filterSelect}
             value={filtroCategoria}
             onChange={(e) => setFiltroCategoria(e.target.value as CategoriaType | 'todas')}
+            style={{ flex: '1 1 180px' }}
           >
-            <option value="todas">Todas las categorias</option>
+            <option value="todas">Todas las categorías</option>
             {CATEGORIAS.map((categoria) => (
               <option key={categoria.tipo} value={categoria.tipo}>
                 {categoria.nombre}
               </option>
             ))}
           </select>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 200px' }}>
+            <input
+              type="number"
+              placeholder="Mín $"
+              className={styles.filterSelect}
+              style={{ width: '100%' }}
+              value={montoMin === null ? '' : montoMin}
+              onChange={(e) => setMontoMin(e.target.value ? Number(e.target.value) : null)}
+            />
+            <span style={{ color: 'var(--got-text-muted)' }}>-</span>
+            <input
+              type="number"
+              placeholder="Máx $"
+              className={styles.filterSelect}
+              style={{ width: '100%' }}
+              value={montoMax === null ? '' : montoMax}
+              onChange={(e) => setMontoMax(e.target.value ? Number(e.target.value) : null)}
+            />
+          </div>
         </div>
 
-        <Button onClick={() => setModalOpen(true)}>
-          <Plus size={16} /> Nuevo Gasto
-        </Button>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginLeft: 'auto', flexWrap: 'wrap' }}>
+          <Button onClick={handleExportCSV} variant="ghost">
+            <Download size={16} /> Exportar CSV
+          </Button>
+          <Button onClick={() => setModalOpen(true)}>
+            <Plus size={16} /> Nuevo Gasto
+          </Button>
+        </div>
       </div>
 
       <Card noPad>

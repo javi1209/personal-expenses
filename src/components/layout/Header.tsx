@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, Calendar } from 'lucide-react';
-import { useAlerts } from '../../hooks/useAlerts.ts';
 import { useFormatting } from '../../hooks/useFormatting.ts';
+import { useAuthStore } from '../../store/authStore.ts';
+import { useAlertasStore } from '../../store/alertasStore.ts';
 import { AlertsPanel } from '../alerts/AlertsPanel.tsx';
 import styles from './Header.module.css';
 
@@ -11,10 +12,19 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle }: HeaderProps) {
-  const alertas = useAlerts();
+  const { alertas, loadAlertas, initializeSockets } = useAlertasStore();
+  const { user } = useAuthStore();
   const { formatDate } = useFormatting();
   const [showAlerts, setShowAlerts] = useState(false);
-  const hayUrgentes = alertas.some((a) => a.urgente);
+
+  const noLeidas = alertas.filter((a) => !a.leida).length;
+
+  useEffect(() => {
+    if (user) {
+      void loadAlertas();
+      initializeSockets();
+    }
+  }, [user, loadAlertas, initializeSockets]);
 
   const hoy = formatDate(new Date(), {
     weekday: 'long', day: 'numeric', month: 'long',
@@ -35,10 +45,10 @@ export function Header({ title, subtitle }: HeaderProps) {
           <button
             className={styles.alertBtn}
             onClick={() => setShowAlerts(true)}
-            aria-label={`${alertas.length} alertas`}
+            aria-label={`${noLeidas} alertas no leídas`}
           >
             <Bell size={18} />
-            {hayUrgentes && <span className={styles.alertDot} />}
+            {noLeidas > 0 && <span className={styles.alertDot}>{noLeidas > 9 ? '9+' : noLeidas}</span>}
           </button>
         </div>
       </header>

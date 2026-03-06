@@ -20,6 +20,11 @@ export const CURRENCY_OPTIONS: Array<{ value: AppCurrency; label: string }> = [
   { value: 'USD', label: 'USD (US Dollar)' },
 ];
 
+export const THEME_OPTIONS: Array<{ value: AppTheme; label: string }> = [
+  { value: 'dark', label: 'Oscuro' },
+  { value: 'light', label: 'Claro' },
+];
+
 const DEFAULT_PREFERENCES = {
   locale: 'es-MX' as AppLocale,
   currency: 'MXN' as AppCurrency,
@@ -76,14 +81,15 @@ const readStoredPreferences = () => {
 const persistPreferences = (prefs: { locale: AppLocale; currency: AppCurrency; theme: AppTheme }) => {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(prefs));
-  if (prefs.theme === 'light') {
-    document.documentElement.classList.add('light-theme');
-  } else {
-    document.documentElement.classList.remove('light-theme');
-  }
+  if (prefs.theme === 'light') document.documentElement.classList.add('light-theme');
+  else document.documentElement.classList.remove('light-theme');
 };
 
 const initial = readStoredPreferences();
+if (typeof window !== 'undefined') {
+  if (initial.theme === 'light') document.documentElement.classList.add('light-theme');
+  else document.documentElement.classList.remove('light-theme');
+}
 
 export const usePreferencesStore = create<PreferencesState>((set, get) => ({
   locale: initial.locale,
