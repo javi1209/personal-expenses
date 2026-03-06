@@ -132,6 +132,29 @@ Importante:
 
 El workflow construye `dist`, genera `dist/404.html` para rutas SPA y publica en Pages.
 
+## Deploy en Vercel
+
+El proyecto ya incluye `vercel.json` para enrutar:
+- `/api/*` a la function `api/index.js`
+- `/*` a `index.html` (SPA fallback)
+
+### Variables necesarias en Vercel
+
+En `Project > Settings > Environment Variables`:
+- `NODE_ENV=production`
+- `MONGODB_URI=<tu-uri-de-mongodb>`
+- `JWT_SECRET=<minimo-32-caracteres>`
+- `CORS_ORIGIN=https://tu-app.vercel.app`
+- `VITE_ENABLE_REALTIME=false` (recomendado en Vercel Serverless)
+
+Opcionales:
+- `JWT_EXPIRES_IN=7d`
+- `RATE_LIMIT_WINDOW_MS=900000`
+- `RATE_LIMIT_MAX=300`
+- `JSON_BODY_LIMIT=100kb`
+
+Nota: en Vercel Functions no hay WebSocket persistente; por eso se recomienda desactivar realtime.
+
 ## Documentacion
 
 - Documentacion tecnica completa: [docs/arquitectura.md](docs/arquitectura.md)

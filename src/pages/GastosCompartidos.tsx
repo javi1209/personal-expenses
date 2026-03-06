@@ -11,7 +11,7 @@ import { Modal } from '../components/ui/Modal.tsx';
 import { useFormatting } from '../hooks/useFormatting.ts';
 import { CATEGORIAS, CATEGORIA_COLORS } from '../data/mockData.ts';
 import { resolveEntityId } from '../services/api.ts';
-import { getSocket, SOCKET_EVENTS } from '../services/socket.ts';
+import { getSocket, REALTIME_ENABLED, SOCKET_EVENTS } from '../services/socket.ts';
 import { useCompartidosStore } from '../store/compartidosStore.ts';
 import { type CategoriaType, type GastoCompartido } from '../types/index.ts';
 import styles from './GastosCompartidos.module.css';
@@ -39,6 +39,7 @@ export function GastosCompartidos() {
 
   useEffect(() => {
     const socket = getSocket();
+    if (!socket) return;
 
     const onNuevo = (incoming: GastoCompartido) => {
       const incomingId = resolveEntityId(incoming);
@@ -159,7 +160,9 @@ export function GastosCompartidos() {
       <div className={styles.toolbar}>
         <div className={styles.liveIndicator}>
           <span className={styles.liveDot} />
-          Sincronizacion en tiempo real activa
+          {REALTIME_ENABLED
+            ? 'Sincronizacion en tiempo real activa'
+            : 'Sincronizacion en tiempo real desactivada en este entorno'}
         </div>
         <Button onClick={() => setModalOpen(true)}>
           <Plus size={16} /> Nuevo Gasto Compartido

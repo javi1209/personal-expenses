@@ -7,7 +7,11 @@ let socketToken: string | null = null;
 
 const readToken = (): string | null => localStorage.getItem(TOKEN_STORAGE_KEY);
 
-export const getSocket = (): Socket => {
+export const REALTIME_ENABLED = import.meta.env.VITE_ENABLE_REALTIME !== 'false';
+
+export const getSocket = (): Socket | null => {
+  if (!REALTIME_ENABLED) return null;
+
   const token = readToken();
   const tokenChanged = token !== socketToken;
 
