@@ -38,6 +38,16 @@ interface PreferencesState {
   updateBackend: () => Promise<void>;
 }
 
+type PreferencesPayload = {
+  locale?: AppLocale;
+  currency?: AppCurrency;
+  theme?: AppTheme;
+};
+
+type PreferencesApiResponse = {
+  data?: PreferencesPayload;
+} & PreferencesPayload;
+
 const isLocale = (value: unknown): value is AppLocale =>
   typeof value === 'string' && LOCALE_OPTIONS.some((option) => option.value === value);
 
@@ -105,7 +115,8 @@ export const usePreferencesStore = create<PreferencesState>((set, get) => ({
         headers: { Authorization: `Bearer ${token}` }
       });
       if (resp.ok) {
-        const settings = await resp.json();
+        const payload = await resp.json() as PreferencesApiResponse;
+        const settings = payload.data ?? payload;
         set({
           locale: isLocale(settings.locale) ? settings.locale : get().locale,
           currency: isCurrency(settings.currency) ? settings.currency : get().currency,

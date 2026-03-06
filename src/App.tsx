@@ -14,6 +14,7 @@ import { usePresupuestosStore } from './store/presupuestosStore.ts';
 import { useCompartidosStore } from './store/compartidosStore.ts';
 import { useCuentasStore } from './store/cuentasStore.ts';
 import { Cuentas } from './pages/Cuentas.tsx';
+import { usePreferencesStore } from './store/preferencesStore.ts';
 
 export default function App() {
   const bootstrapAuth = useAuthStore((s) => s.bootstrapAuth);
@@ -25,6 +26,7 @@ export default function App() {
   const loadPresupuestos = usePresupuestosStore((s) => s.loadPresupuestos);
   const loadCompartidos = useCompartidosStore((s) => s.loadGastos);
   const loadCuentas = useCuentasStore((s) => s.loadCuentas);
+  const syncPreferences = usePreferencesStore((s) => s.syncWithBackend);
   const isAuthenticated = Boolean(user && token);
   const userId = user?.id ?? null;
 
@@ -46,7 +48,12 @@ export default function App() {
       loadCompartidos(),
       loadCuentas(),
     ]);
-  }, [isAuthenticated, userId, loadGastos, loadPresupuestos, loadCompartidos]);
+  }, [isAuthenticated, userId, loadGastos, loadPresupuestos, loadCompartidos, loadCuentas]);
+
+  useEffect(() => {
+    if (!token) return;
+    void syncPreferences(token);
+  }, [token, syncPreferences]);
 
   if (checkingAuth) {
     return (
