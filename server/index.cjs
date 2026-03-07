@@ -1039,7 +1039,7 @@ app.post(
     const existing = await User.findOne({ email }).lean();
     if (existing) conflict('El email ya esta registrado');
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ nombre, email, passwordHash });
     const token = signAuthToken(user);
 
