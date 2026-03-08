@@ -1,25 +1,9 @@
-let app, connectDatabase;
-let initError = null;
+import serverModule from "../server/index.cjs";
 
-try {
-    const serverModule = require("../server/index.cjs");
-    app = serverModule.app;
-    connectDatabase = serverModule.connectDatabase;
-} catch (error) {
-    initError = error;
-    console.error("Initialization error en Vercel:", error);
-}
-
+const { app, connectDatabase } = serverModule;
 let isConnected = false;
 
-module.exports = async (req, res) => {
-    if (initError) {
-        return res.status(500).json({
-            message: "Error de inicialización en el servidor (Vercel)",
-            errorDetalle: initError.message || initError.toString()
-        });
-    }
-
+export default async (req, res) => {
     if (!isConnected) {
         try {
             await connectDatabase();
