@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Wallet, Tag, Target, Users, BarChart3,
-  ChevronsLeft, ChevronsRight, Crown, LogOut, Landmark,
+  ChevronsLeft, ChevronsRight, Crown, LogOut, Landmark, ChevronDown,
 } from 'lucide-react';
 import { useAlerts } from '../../hooks/useAlerts.ts';
 import { useAuthStore } from '../../store/authStore.ts';
@@ -30,6 +30,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [regionOpen, setRegionOpen] = useState(false);
   const location = useLocation();
   const alertas = useAlerts();
   const urgentes = alertas.filter((a) => a.urgente).length;
@@ -83,52 +84,67 @@ export function Sidebar() {
           <p className={styles.userEmail}>{user?.email ?? ''}</p>
         </div>
         <div className={styles.settingsBox}>
-          <p className={styles.settingsTitle}>Region</p>
-          <label className={styles.settingsLabel}>
-            Locale
-            <select
-              className={styles.settingsSelect}
-              value={locale}
-              onChange={(event) => setLocale(event.target.value as AppLocale)}
-              aria-label="Configurar locale"
-            >
-              {LOCALE_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={styles.settingsLabel}>
-            Moneda
-            <select
-              className={styles.settingsSelect}
-              value={currency}
-              onChange={(event) => setCurrency(event.target.value as AppCurrency)}
-              aria-label="Configurar moneda"
-            >
-              {CURRENCY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className={styles.settingsLabel}>
-            Tema
-            <select
-              className={styles.settingsSelect}
-              value={theme}
-              onChange={(event) => setTheme(event.target.value as AppTheme)}
-              aria-label="Configurar tema"
-            >
-              {THEME_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
+          <button
+            type="button"
+            className={styles.settingsToggle}
+            onClick={() => setRegionOpen((o) => !o)}
+            aria-expanded={regionOpen}
+          >
+            <p className={styles.settingsTitle}>Region</p>
+            <ChevronDown
+              size={12}
+              className={`${styles.settingsChevron} ${regionOpen ? styles.settingsChevronOpen : ''}`}
+            />
+          </button>
+          {regionOpen && (
+            <div className={styles.settingsContent}>
+              <label className={styles.settingsLabel}>
+                Locale
+                <select
+                  className={styles.settingsSelect}
+                  value={locale}
+                  onChange={(event) => setLocale(event.target.value as AppLocale)}
+                  aria-label="Configurar locale"
+                >
+                  {LOCALE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={styles.settingsLabel}>
+                Moneda
+                <select
+                  className={styles.settingsSelect}
+                  value={currency}
+                  onChange={(event) => setCurrency(event.target.value as AppCurrency)}
+                  aria-label="Configurar moneda"
+                >
+                  {CURRENCY_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={styles.settingsLabel}>
+                Tema
+                <select
+                  className={styles.settingsSelect}
+                  value={theme}
+                  onChange={(event) => setTheme(event.target.value as AppTheme)}
+                  aria-label="Configurar tema"
+                >
+                  {THEME_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
         </div>
         <motion.button
           whileHover={{ backgroundColor: 'var(--got-red-dim)', color: 'var(--got-red-light)' }}

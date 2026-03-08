@@ -22,16 +22,15 @@
 .sidebar::after {
   content: '';
   position: absolute;
-  top: 0; right: 0;
+  top: 0;
+  right: 0;
   width: 1px;
   height: 100%;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    var(--got-gold-dim) 20%,
-    var(--got-gold-dim) 80%,
-    transparent
-  );
+  background: linear-gradient(180deg,
+      transparent,
+      var(--got-gold-dim) 20%,
+      var(--got-gold-dim) 80%,
+      transparent);
 }
 
 .brand {
@@ -134,7 +133,9 @@
 .navItem.active::before {
   content: '';
   position: absolute;
-  left: 0; top: 0; bottom: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
   width: 3px;
   background: var(--got-gold);
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
@@ -228,6 +229,38 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--got-text-dim);
+}
+
+.settingsToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.settingsToggle:hover .settingsTitle {
+  color: var(--got-gold-dim);
+}
+
+.settingsChevron {
+  color: var(--got-text-dim);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.settingsChevronOpen {
+  transform: rotate(180deg);
+}
+
+.settingsContent {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
 }
 
 .settingsLabel {

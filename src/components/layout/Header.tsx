@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bell, Calendar } from 'lucide-react';
+import { Bell, Calendar, UserCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useFormatting } from '../../hooks/useFormatting.ts';
 import { useAuthStore } from '../../store/authStore.ts';
@@ -43,6 +43,12 @@ export function Header({ title, subtitle }: HeaderProps) {
             <Calendar size={12} />
             {hoy}
           </div>
+          {user && (
+            <div className={styles.userChip}>
+              <UserCircle2 size={14} />
+              <span>{user.nombre}</span>
+            </div>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
