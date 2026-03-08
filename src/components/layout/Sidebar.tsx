@@ -34,7 +34,6 @@ export function Sidebar() {
   const location = useLocation();
   const alertas = useAlerts();
   const urgentes = alertas.filter((a) => a.urgente).length;
-  const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const locale = usePreferencesStore((s) => s.locale);
   const currency = usePreferencesStore((s) => s.currency);
@@ -79,10 +78,6 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className={styles.footer}>
-        <div className={styles.userBox}>
-          <p className={styles.userName}>{user?.nombre ?? 'Usuario'}</p>
-          <p className={styles.userEmail}>{user?.email ?? ''}</p>
-        </div>
         <div className={styles.settingsBox}>
           <button
             type="button"
