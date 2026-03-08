@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Wallet, Tag, Target, Users, BarChart3,
   ChevronsLeft, ChevronsRight, Crown, LogOut, Landmark,
@@ -59,17 +60,18 @@ export function Sidebar() {
             ? location.pathname === '/'
             : location.pathname.startsWith(to);
           return (
-            <NavLink
-              key={to}
-              to={to}
-              className={`${styles.navItem} ${isActive ? styles.active : ''}`}
-            >
-              <Icon className={styles.navIcon} />
-              <span className={styles.navLabel}>{label}</span>
-              {label === 'Dashboard' && urgentes > 0 && (
-                <span className={styles.alertBadge}>{urgentes}</span>
-              )}
-            </NavLink>
+            <motion.div key={to} whileHover={{ x: 5 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
+              <NavLink
+                to={to}
+                className={`${styles.navItem} ${isActive ? styles.active : ''}`}
+              >
+                <Icon className={styles.navIcon} />
+                <span className={styles.navLabel}>{label}</span>
+                {label === 'Dashboard' && urgentes > 0 && (
+                  <span className={styles.alertBadge}>{urgentes}</span>
+                )}
+              </NavLink>
+            </motion.div>
           );
         })}
       </nav>
@@ -128,7 +130,9 @@ export function Sidebar() {
             </select>
           </label>
         </div>
-        <button
+        <motion.button
+          whileHover={{ backgroundColor: 'var(--got-red-dim)', color: 'var(--got-red-light)' }}
+          whileTap={{ scale: 0.98 }}
           className={styles.logoutBtn}
           onClick={logout}
           type="button"
@@ -136,8 +140,10 @@ export function Sidebar() {
         >
           <LogOut size={15} />
           <span className={styles.logoutLabel}>Cerrar sesion</span>
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileHover={{ color: 'var(--got-gold)' }}
+          whileTap={{ scale: 0.95 }}
           className={styles.collapseBtn}
           onClick={() => setCollapsed((c) => !c)}
           aria-label={collapsed ? 'Expandir menú' : 'Colapsar menú'}
@@ -149,7 +155,7 @@ export function Sidebar() {
           <span className={styles.collapseBtnLabel}>
             {collapsed ? '' : 'Colapsar'}
           </span>
-        </button>
+        </motion.button>
       </div>
     </aside>
   );

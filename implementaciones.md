@@ -18,16 +18,18 @@ He reorganizado la lista por **Prioridad (P1 a P4)** para que tengas una guía c
 - [x] **Filtros Avanzados**: Filtro por rango de montos (mínimo/máximo) en la lista de gastos.
 - [x] **Notificaciones**: Avisos proactivos (Push o Email) cuando se registra un pago en un gasto compartido o cuando un presupuesto llega al 90%.
 
-## [P4] Experiencia de Usuario y Pulido (Baja)
+## [P4] Experiencia de Usuario y Pulido (Baja) ✅ Completo
 
-- [ ] **Micro-interacciones**: Agregar animaciones fluidas al abrir modales o al actualizar gráficos para esa sensación "premium".
-- [ ] **Aumento de Cobertura de Tests**: Extender la suite de tests unitarios y E2E para cubrir los flujos de "Gastos Compartidos" y "Reportes".
+- [x] **Micro-interacciones**: Agregar animaciones fluidas al abrir modales o al actualizar gráficos para esa sensación "premium".
+- [x] **Aumento de Cobertura de Tests**: Extender la suite de tests unitarios y E2E para cubrir los flujos de "Gastos Compartidos" y "Reportes".
 
 ---
 
 ### Completadas recientemente:
 
-- [X] **Despliegue Full-Stack (Vercel)**: Configuración de Serverless Functions y ruteo SPA para despliegue gratuito sin tarjeta.
+- [X] **Micro-interacciones UI/UX**: Incorporación de animaciones con Framer Motion en componentes UI principales (Modales, Alertas).
+- [X] **Cobertura de Tests API**: Agregadas pruebas de integración para los flujos de "Gastos Compartidos" y "Reportes".
+- [X] **Despliegue Full-Stack (Vercel)**: API en producción funcionando en `personal-expenses-eight.vercel.app`. Resueltos: módulos ESM en `api/index.js`, variables de entorno (`JWT_SECRET`, `MONGODB_URI`, `CORS_ORIGIN`) y autenticación con MongoDB Atlas.
 - [X] ~~**Modo Oscuro/Claro**: Selector de tema manual persistido en localStorage y sincronizado con el backend.~~
 - [X] ~~**Datos y reportes reales**: Tendencia mensual calculada desde API real (`/reportes/tendencia`), no datos hardcodeados.~~
 - [X] ~~**Gestión de Cuentas**: Manejo de múltiples billeteras con saldos reales y sincronización automática.~~

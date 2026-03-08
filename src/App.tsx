@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Layout } from './components/layout/Layout.tsx';
 import { Dashboard } from './pages/Dashboard.tsx';
 import { Auth } from './pages/Auth.tsx';
@@ -29,6 +30,7 @@ export default function App() {
   const syncPreferences = usePreferencesStore((s) => s.syncWithBackend);
   const isAuthenticated = Boolean(user && token);
   const userId = user?.id ?? null;
+  const location = useLocation();
 
   useEffect(() => {
     void bootstrapAuth();
@@ -83,19 +85,33 @@ export default function App() {
     );
   }
 
+  const PageTransition = ({ children }: { children: React.ReactNode }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.3 }}
+      style={{ width: '100%', height: '100%' }}
+    >
+      {children}
+    </motion.div>
+  );
+
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/gastos" element={<Gastos />} />
-        <Route path="/categorias" element={<Categorias />} />
-        <Route path="/presupuestos" element={<Presupuestos />} />
-        <Route path="/compartidos" element={<GastosCompartidos />} />
-        <Route path="/cuentas" element={<Cuentas />} />
-        <Route path="/reportes" element={<Reportes />} />
-        <Route path="/auth" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+          <Route path="/gastos" element={<PageTransition><Gastos /></PageTransition>} />
+          <Route path="/categorias" element={<PageTransition><Categorias /></PageTransition>} />
+          <Route path="/presupuestos" element={<PageTransition><Presupuestos /></PageTransition>} />
+          <Route path="/compartidos" element={<PageTransition><GastosCompartidos /></PageTransition>} />
+          <Route path="/cuentas" element={<PageTransition><Cuentas /></PageTransition>} />
+          <Route path="/reportes" element={<PageTransition><Reportes /></PageTransition>} />
+          <Route path="/auth" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AnimatePresence>
     </Layout>
   );
 }

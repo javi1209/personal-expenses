@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Bell, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useFormatting } from '../../hooks/useFormatting.ts';
 import { useAuthStore } from '../../store/authStore.ts';
 import { useAlertasStore } from '../../store/alertasStore.ts';
@@ -42,14 +43,16 @@ export function Header({ title, subtitle }: HeaderProps) {
             <Calendar size={12} />
             {hoy}
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             className={styles.alertBtn}
             onClick={() => setShowAlerts(true)}
             aria-label={`${noLeidas} alertas no leídas`}
           >
             <Bell size={18} />
             {noLeidas > 0 && <span className={styles.alertDot}>{noLeidas > 9 ? '9+' : noLeidas}</span>}
-          </button>
+          </motion.button>
         </div>
       </header>
       <AlertsPanel open={showAlerts} onClose={() => setShowAlerts(false)} alertas={alertas} />
