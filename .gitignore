@@ -36,3 +36,4 @@ dist-ssr
 
 # Artifacts
 .gemini/antigravity/brain/*
+.vercel

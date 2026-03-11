@@ -1,9 +1,10 @@
-import serverModule from "../server/index.cjs";
+const serverModule = require("../server/index.cjs");
 
 const { app, connectDatabase } = serverModule;
 let isConnected = false;
 
-export default async (req, res) => {
+module.exports = async (req, res) => {
+    console.log(`[Vercel API] ${req.method} ${req.url}`);
     if (!isConnected) {
         try {
             await connectDatabase();
