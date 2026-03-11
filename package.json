@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:full": "node scripts/dev-full.mjs",
+    "dev:memory": "node scripts/dev-memory.mjs",
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "test:api": "vitest run tests/api",
