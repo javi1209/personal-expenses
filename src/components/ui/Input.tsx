@@ -1,7 +1,8 @@
-import { type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { useId, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import styles from './Input.module.css';
 
 interface FieldWrapperProps {
+  id?: string;
   label?: string;
   required?: boolean;
   error?: string;
@@ -9,11 +10,11 @@ interface FieldWrapperProps {
   children: React.ReactNode;
 }
 
-function FieldWrapper({ label, required, error, helper, children }: FieldWrapperProps) {
+function FieldWrapper({ id, label, required, error, helper, children }: FieldWrapperProps) {
   return (
     <div className={styles.field}>
       {label && (
-        <label className={styles.label}>
+        <label className={styles.label} htmlFor={id}>
           {label}
           {required && <span className={styles.required}>*</span>}
         </label>
@@ -31,10 +32,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   helper?: string;
 }
 
-export function Input({ label, error, helper, required, ...rest }: InputProps) {
+export function Input({ label, error, helper, required, id: providedId, ...rest }: InputProps) {
+  const generatedId = useId();
+  const id = providedId || generatedId;
+
   return (
-    <FieldWrapper label={label} required={required} error={error} helper={helper}>
-      <input className={styles.input} required={required} {...rest} />
+    <FieldWrapper id={id} label={label} required={required} error={error} helper={helper}>
+      <input id={id} className={styles.input} required={required} {...rest} />
     </FieldWrapper>
   );
 }
@@ -46,10 +50,13 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   options: { value: string; label: string }[];
 }
 
-export function Select({ label, error, helper, required, options, ...rest }: SelectProps) {
+export function Select({ label, error, helper, required, options, id: providedId, ...rest }: SelectProps) {
+  const generatedId = useId();
+  const id = providedId || generatedId;
+
   return (
-    <FieldWrapper label={label} required={required} error={error} helper={helper}>
-      <select className={styles.select} required={required} {...rest}>
+    <FieldWrapper id={id} label={label} required={required} error={error} helper={helper}>
+      <select id={id} className={styles.select} required={required} {...rest}>
         <option value="">— Seleccionar —</option>
         {options.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
@@ -65,10 +72,13 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   helper?: string;
 }
 
-export function Textarea({ label, error, helper, required, ...rest }: TextareaProps) {
+export function Textarea({ label, error, helper, required, id: providedId, ...rest }: TextareaProps) {
+  const generatedId = useId();
+  const id = providedId || generatedId;
+
   return (
-    <FieldWrapper label={label} required={required} error={error} helper={helper}>
-      <textarea className={styles.textarea} required={required} {...rest} />
+    <FieldWrapper id={id} label={label} required={required} error={error} helper={helper}>
+      <textarea id={id} className={styles.textarea} required={required} {...rest} />
     </FieldWrapper>
   );
 }

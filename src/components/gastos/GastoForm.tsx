@@ -66,12 +66,14 @@ export function GastoForm({ onClose, initial }: GastoFormProps) {
     <form onSubmit={handleSubmit} className={styles.form}>
       <div className={styles.row}>
         <Input
+          id="descripcion" name="descripcion"
           label="Descripción" required
           value={form.descripcion}
           onChange={(e) => set('descripcion', e.target.value)}
           placeholder="Ej: Supermercado, Renta…"
         />
         <Input
+          id="monto" name="monto"
           label={`Monto (${currency})`} required type="number" min={0} step={0.01}
           value={form.monto || ''}
           onChange={(e) => set('monto', e.target.value)}
@@ -81,11 +83,13 @@ export function GastoForm({ onClose, initial }: GastoFormProps) {
 
       <div className={styles.row}>
         <Input
+          id="fecha" name="fecha"
           label="Fecha" required type="date"
           value={form.fecha}
           onChange={(e) => set('fecha', e.target.value)}
         />
         <Select
+          id="categoria" name="categoria"
           label="Categoría" required
           value={form.categoria}
           options={CAT_OPTIONS}
@@ -95,6 +99,7 @@ export function GastoForm({ onClose, initial }: GastoFormProps) {
 
       <div className={styles.row}>
         <Select
+          id="cuentaId" name="cuentaId"
           label="Pagar con"
           value={form.cuentaId}
           options={[
@@ -135,6 +140,7 @@ export function GastoForm({ onClose, initial }: GastoFormProps) {
       )}
 
       <Textarea
+        id="notas" name="notas"
         label="Notas"
         value={form.notas}
         onChange={(e) => set('notas', e.target.value)}

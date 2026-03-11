@@ -103,6 +103,8 @@ export function Auth() {
         <form className={styles.form} onSubmit={handleSubmit}>
           {mode === 'register' && (
             <Input
+              id="nombre"
+              name="name"
               required
               label="Nombre"
               placeholder="Tu nombre"
@@ -112,6 +114,8 @@ export function Auth() {
           )}
 
           <Input
+            id="email"
+            name="email"
             required
             label="Email"
             type="email"
@@ -121,6 +125,8 @@ export function Auth() {
           />
 
           <Input
+            id="password"
+            name="password"
             required
             label="Password"
             type="password"
