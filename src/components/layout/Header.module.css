@@ -13,7 +13,37 @@
 
 .left {
   display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.titles {
+  display: flex;
   flex-direction: column;
+}
+
+.menuBtn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--got-border);
+  border-radius: var(--radius-sm);
+  color: var(--got-text-muted);
+  padding: var(--space-2);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.menuBtn:hover {
+  border-color: var(--got-gold-dim);
+  color: var(--got-gold);
+}
+
+@media (max-width: 768px) {
+  .menuBtn {
+    display: flex;
+  }
 }
 
 .pageTitle {
@@ -102,6 +132,12 @@
   font-family: var(--font-data);
   font-size: var(--text-xs);
   color: var(--got-text-muted);
+}
+
+@media (max-width: 768px) {
+  .dateChip {
+    display: none; /* Hide date on mobile to save space */
+  }
 }
 
 .userChip {

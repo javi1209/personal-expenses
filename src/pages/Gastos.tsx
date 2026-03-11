@@ -292,91 +292,93 @@ export function Gastos() {
           )
         ) : (
           <>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Descripcion</th>
-                  <th>Categoria</th>
-                  <th>Fecha</th>
-                  <th>Estado</th>
-                  <th style={{ textAlign: 'right' }}>Monto</th>
-                  <th style={{ textAlign: 'right' }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {gastos.map((gasto) => (
-                  <tr key={gasto.id}>
-                    <td>
-                      <div>{gasto.descripcion}</div>
-                      {gasto.notas && (
-                        <div
-                          style={{
-                            fontSize: 'var(--text-xs)',
-                            color: 'var(--got-text-dim)',
-                            marginTop: 2,
-                          }}
-                        >
-                          {gasto.notas}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <div className={styles.catCell}>
-                        <span
-                          className={styles.catDot}
-                          style={{ background: CATEGORIA_COLORS[gasto.categoria] ?? '#94a3b8' }}
-                        />
-                        {gasto.categoriaLabel}
-                      </div>
-                    </td>
-                    <td>
-                      {formatDate(gasto.fecha, {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
-                        {gasto.esRecurrente && <Badge color="gold">Recurrente</Badge>}
-                        {gasto.cuentaVence && (
-                          <Badge color="red">
-                            <Clock size={10} />
-                            Vence{' '}
-                            {formatDate(gasto.cuentaVence, {
-                              day: 'numeric',
-                              month: 'short',
-                            })}
-                          </Badge>
-                        )}
-                        {gasto.esCompartido && <Badge color="blue">Compartido</Badge>}
-                      </div>
-                    </td>
-                    <td className={styles.amount}>{fmt(gasto.monto)}</td>
-                    <td>
-                      <div className={styles.actions}>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleEdit(gasto)}
-                          aria-label="Editar"
-                        >
-                          <Pencil size={14} />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="danger"
-                          onClick={() => void handleDelete(gasto)}
-                          aria-label="Eliminar"
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </td>
+            <div className={styles.tableContainer}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Descripcion</th>
+                    <th>Categoria</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th style={{ textAlign: 'right' }}>Monto</th>
+                    <th style={{ textAlign: 'right' }}>Acciones</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {gastos.map((gasto) => (
+                    <tr key={gasto.id}>
+                      <td>
+                        <div>{gasto.descripcion}</div>
+                        {gasto.notas && (
+                          <div
+                            style={{
+                              fontSize: 'var(--text-xs)',
+                              color: 'var(--got-text-dim)',
+                              marginTop: 2,
+                            }}
+                          >
+                            {gasto.notas}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <div className={styles.catCell}>
+                          <span
+                            className={styles.catDot}
+                            style={{ background: CATEGORIA_COLORS[gasto.categoria] ?? '#94a3b8' }}
+                          />
+                          {gasto.categoriaLabel}
+                        </div>
+                      </td>
+                      <td>
+                        {formatDate(gasto.fecha, {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 'var(--space-1)', flexWrap: 'wrap' }}>
+                          {gasto.esRecurrente && <Badge color="gold">Recurrente</Badge>}
+                          {gasto.cuentaVence && (
+                            <Badge color="red">
+                              <Clock size={10} />
+                              Vence{' '}
+                              {formatDate(gasto.cuentaVence, {
+                                day: 'numeric',
+                                month: 'short',
+                              })}
+                            </Badge>
+                          )}
+                          {gasto.esCompartido && <Badge color="blue">Compartido</Badge>}
+                        </div>
+                      </td>
+                      <td className={styles.amount}>{fmt(gasto.monto)}</td>
+                      <td>
+                        <div className={styles.actions}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleEdit(gasto)}
+                            aria-label="Editar"
+                          >
+                            <Pencil size={14} />
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="danger"
+                            onClick={() => void handleDelete(gasto)}
+                            aria-label="Eliminar"
+                          >
+                            <Trash2 size={14} />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             <div className={styles.total}>
               <span className={styles.totalLabel}>Total del periodo</span>
               <span className={styles.totalValue}>{fmt(total)}</span>

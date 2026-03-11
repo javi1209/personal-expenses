@@ -13,7 +13,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
   gap: var(--space-4);
 }
 
@@ -25,7 +25,9 @@
   transition: all var(--transition-fast);
 }
 
-.card:hover { border-color: var(--got-border-gold); }
+.card:hover {
+  border-color: var(--got-border-gold);
+}
 
 .cardHeader {
   display: flex;
@@ -85,7 +87,7 @@
 
 .participante.pagado {
   border-color: var(--got-green);
-  background: rgba(45,110,74,0.08);
+  background: rgba(45, 110, 74, 0.08);
 }
 
 .partLeft {
@@ -193,7 +195,9 @@
   flex-shrink: 0;
 }
 
-.removePartBtn:hover { color: var(--got-red-light); }
+.removePartBtn:hover {
+  color: var(--got-red-light);
+}
 
 .actions {
   display: flex;
@@ -225,6 +229,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
 }

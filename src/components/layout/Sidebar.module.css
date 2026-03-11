@@ -18,6 +18,29 @@
   width: var(--sidebar-collapsed);
 }
 
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    display: block;
+  }
+}
+
 /* Top ornamental line */
 .sidebar::after {
   content: '';
@@ -355,4 +378,10 @@
   width: 0;
   padding: 0;
   border: 0;
+}
+
+@media (max-width: 768px) {
+  .collapseBtn {
+    display: none;
+  }
 }

@@ -10,7 +10,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: var(--space-4);
 }
 
@@ -29,7 +29,7 @@
 
 .presupCard.excedido {
   border-color: var(--got-red);
-  background: rgba(139,26,26,0.05);
+  background: rgba(139, 26, 26, 0.05);
 }
 
 .presupHeader {
@@ -124,7 +124,9 @@
   transition: color var(--transition-fast);
 }
 
-.deleteBtn:hover { color: var(--got-red-light); }
+.deleteBtn:hover {
+  color: var(--got-red-light);
+}
 
 /* Form */
 .form {

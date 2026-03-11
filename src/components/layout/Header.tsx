@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Bell, Calendar, UserCircle2 } from 'lucide-react';
+import { Bell, Calendar, UserCircle2, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useFormatting } from '../../hooks/useFormatting.ts';
 import { useAuthStore } from '../../store/authStore.ts';
 import { useAlertasStore } from '../../store/alertasStore.ts';
 import { AlertsPanel } from '../alerts/AlertsPanel.tsx';
+import { useLayoutStore } from '../../store/layoutStore.ts';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -17,6 +18,7 @@ export function Header({ title, subtitle }: HeaderProps) {
   const { user } = useAuthStore();
   const { formatDate } = useFormatting();
   const [showAlerts, setShowAlerts] = useState(false);
+  const toggleMobileSidebar = useLayoutStore((s) => s.toggleMobileSidebar);
 
   const noLeidas = alertas.filter((a) => !a.leida).length;
 
@@ -35,8 +37,18 @@ export function Header({ title, subtitle }: HeaderProps) {
     <>
       <header className={styles.header}>
         <div className={styles.left}>
-          <h1 className={styles.pageTitle}>{title}</h1>
-          {subtitle && <span className={styles.pageSubtitle}>{subtitle}</span>}
+          <button
+            type="button"
+            className={styles.menuBtn}
+            onClick={toggleMobileSidebar}
+            aria-label="Abrir menú"
+          >
+            <Menu size={20} />
+          </button>
+          <div className={styles.titles}>
+            <h1 className={styles.pageTitle}>{title}</h1>
+            {subtitle && <span className={styles.pageSubtitle}>{subtitle}</span>}
+          </div>
         </div>
         <div className={styles.right}>
           <div className={styles.dateChip}>

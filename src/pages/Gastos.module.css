@@ -27,15 +27,24 @@
   transition: border-color var(--transition-fast);
 }
 
-.filterSelect:focus, .filterSelect:hover {
+.filterSelect:focus,
+.filterSelect:hover {
   border-color: var(--got-gold-dim);
 }
 
-.filterSelect option { background: var(--got-surface); }
+.filterSelect option {
+  background: var(--got-surface);
+}
+
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+}
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  white-space: nowrap;
 }
 
 .table thead tr {
