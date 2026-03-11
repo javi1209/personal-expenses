@@ -1,0 +1,182 @@
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-6);
+}
+
+.errorState, .emptyState {
+  margin-top: var(--space-8);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-6);
+}
+
+.metaCard {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metaCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.lograda {
+  border: 1px solid var(--got-green);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.metaHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-4);
+}
+
+.titleArea {
+  flex: 1;
+}
+
+.metaTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--got-gold);
+  margin-bottom: var(--space-1);
+}
+
+.metaDeadline {
+  font-size: var(--text-xs);
+  color: var(--got-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.logradaIcon {
+  color: var(--got-green);
+}
+
+.editBtn, .deleteBtn {
+  background: none;
+  border: none;
+  color: var(--got-text-muted);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.editBtn:hover {
+  color: var(--got-blue);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.deleteBtn:hover {
+  color: var(--got-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.amounts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--got-text-bright);
+}
+
+.target {
+  font-size: var(--text-sm);
+  color: var(--got-text-muted);
+}
+
+.barTrack {
+  height: 8px;
+  background: var(--got-bg-darker);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--got-border-dim);
+}
+
+.barFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pctText {
+  font-size: var(--text-xs);
+  color: var(--got-text-muted);
+  font-weight: 600;
+}
+
+.aporteBtn {
+  font-size: var(--text-xs);
+  height: auto;
+  padding: var(--space-1) var(--space-3);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.neededText {
+  font-size: var(--text-xs);
+  color: var(--got-gold);
+  font-weight: 600;
+  font-family: var(--font-data);
+}
+
+.statusArea {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

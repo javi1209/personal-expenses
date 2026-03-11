@@ -162,3 +162,106 @@
 .inlineState {
   margin-top: var(--space-2);
 }
+
+.welcomeBanner {
+  background: var(--got-surface-light);
+  border: 1px solid var(--got-gold-dim);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: relative;
+  overflow: hidden;
+  animation: slideDown 0.5s ease-out;
+}
+
+.welcomeBanner::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 4px;
+  background: var(--got-gold);
+}
+
+.welcomeTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  color: var(--got-gold);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.welcomeText {
+  color: var(--got-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  max-width: 600px;
+}
+
+.summaryRow {
+  display: flex;
+  gap: var(--space-8);
+  margin-top: var(--space-2);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.summaryLabel {
+  font-size: var(--text-xs);
+  color: var(--got-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summaryValue {
+  font-family: var(--font-data);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--got-text-light);
+}
+
+.summaryValue.success {
+  color: var(--got-green-light);
+}
+
+.summaryValue.danger {
+  color: var(--got-red-light);
+}
+
+.closeBanner {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  background: none;
+  border: none;
+  color: var(--got-text-dim);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.closeBanner:hover {
+  color: var(--got-text-light);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .summaryRow {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}

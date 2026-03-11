@@ -7,6 +7,7 @@ import { Auth } from './pages/Auth.tsx';
 import { Gastos } from './pages/Gastos.tsx';
 import { Categorias } from './pages/Categorias.tsx';
 import { Presupuestos } from './pages/Presupuestos.tsx';
+import { Metas } from './pages/Metas.tsx';
 import { GastosCompartidos } from './pages/GastosCompartidos.tsx';
 import { Reportes } from './pages/Reportes.tsx';
 import { useAuthStore } from './store/authStore.ts';
@@ -14,6 +15,7 @@ import { useGastosStore } from './store/gastosStore.ts';
 import { usePresupuestosStore } from './store/presupuestosStore.ts';
 import { useCompartidosStore } from './store/compartidosStore.ts';
 import { useCuentasStore } from './store/cuentasStore.ts';
+import { useMetasStore } from './store/metasStore.ts';
 import { Cuentas } from './pages/Cuentas.tsx';
 import { usePreferencesStore } from './store/preferencesStore.ts';
 
@@ -27,6 +29,7 @@ export default function App() {
   const loadPresupuestos = usePresupuestosStore((s) => s.loadPresupuestos);
   const loadCompartidos = useCompartidosStore((s) => s.loadGastos);
   const loadCuentas = useCuentasStore((s) => s.loadCuentas);
+  const loadMetas = useMetasStore((s) => s.loadMetas);
   const syncPreferences = usePreferencesStore((s) => s.syncWithBackend);
   const isAuthenticated = Boolean(user && token);
   const userId = user?.id ?? null;
@@ -49,6 +52,7 @@ export default function App() {
       loadPresupuestos(),
       loadCompartidos(),
       loadCuentas(),
+      loadMetas(),
     ]);
   }, [isAuthenticated, userId, loadGastos, loadPresupuestos, loadCompartidos, loadCuentas]);
 
@@ -105,6 +109,7 @@ export default function App() {
           <Route path="/gastos" element={<PageTransition><Gastos /></PageTransition>} />
           <Route path="/categorias" element={<PageTransition><Categorias /></PageTransition>} />
           <Route path="/presupuestos" element={<PageTransition><Presupuestos /></PageTransition>} />
+          <Route path="/metas" element={<PageTransition><Metas /></PageTransition>} />
           <Route path="/compartidos" element={<PageTransition><GastosCompartidos /></PageTransition>} />
           <Route path="/cuentas" element={<PageTransition><Cuentas /></PageTransition>} />
           <Route path="/reportes" element={<PageTransition><Reportes /></PageTransition>} />

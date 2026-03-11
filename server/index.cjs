@@ -307,6 +307,28 @@ const AlertaSchema = new mongoose.Schema(
 );
 
 const Alerta = mongoose.models.Alerta ?? mongoose.model('Alerta', AlertaSchema);
+
+const MetaAhorroSchema = new mongoose.Schema(
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    nombre: { type: String, required: true, trim: true },
+    montoObjetivo: { type: Number, required: true },
+    montoActual: { type: Number, default: 0 },
+    fechaLimite: { type: String, required: true },
+    aportes: [
+      {
+        monto: { type: Number, required: true },
+        fecha: { type: String, required: true },
+        notas: String,
+      },
+    ],
+    lograda: { type: Boolean, default: false },
+    color: { type: String, default: '#94a3b8' },
+  },
+  { timestamps: true }
+);
+
+const MetaAhorro = mongoose.models.MetaAhorro ?? mongoose.model('MetaAhorro', MetaAhorroSchema);
 const ALLOWED_CATEGORIAS = new Set([
   'alimentacion',
   'transporte',
@@ -792,6 +814,58 @@ const sanitizeCuentaPayload = (body, options = {}) => {
   return data;
 };
 
+const sanitizeMetaAhorroPayload = (body, options = {}) => {
+  const { partial = false } = options;
+  const payload = assertObjectBody(body, 'Payload de meta de ahorro');
+  ensureAllowedFields(
+    payload,
+    new Set(['nombre', 'montoObjetivo', 'fechaLimite', 'color', 'lograda'])
+  );
+
+  const data = {};
+
+  if (!partial || Object.prototype.hasOwnProperty.call(payload, 'nombre')) {
+    data.nombre = readString(payload, 'nombre', {
+      required: !partial,
+      minLength: 2,
+      maxLength: 100,
+    });
+  }
+
+  if (!partial || Object.prototype.hasOwnProperty.call(payload, 'montoObjetivo')) {
+    data.montoObjetivo = readNumber(payload, 'montoObjetivo', {
+      required: !partial,
+      min: 0.01,
+      allowZero: false,
+    });
+  }
+
+  if (!partial || Object.prototype.hasOwnProperty.call(payload, 'fechaLimite')) {
+    data.fechaLimite = readDate(payload, 'fechaLimite', { required: !partial });
+  }
+
+  if (!partial || Object.prototype.hasOwnProperty.call(payload, 'color')) {
+    data.color = readHexColor(payload, 'color') ?? '#94a3b8';
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'lograda')) {
+    data.lograda = readBoolean(payload, 'lograda');
+  }
+
+  return data;
+};
+
+const sanitizeAportePayload = (body) => {
+  const payload = assertObjectBody(body, 'Payload de aporte');
+  ensureAllowedFields(payload, new Set(['monto', 'fecha', 'notas']));
+
+  return {
+    monto: readNumber(payload, 'monto', { required: true, min: 0.01, allowZero: false }),
+    fecha: readDate(payload, 'fecha', { required: true }),
+    notas: readString(payload, 'notas', { maxLength: 200, allowEmpty: true }) ?? '',
+  };
+};
+
 const sanitizeParticipantes = (rawParticipantes, montoTotal) => {
   if (!Array.isArray(rawParticipantes) || rawParticipantes.length === 0) {
     badRequest('Debe incluir al menos un participante');
@@ -957,8 +1031,15 @@ const sanitizePresupuestoPayload = (body, options = {}) => {
 
 const getSpentForCategoria = async (categoria, userId) => {
   const objectUserId = new mongoose.Types.ObjectId(userId);
+  const mesActual = getMesActual();
   const [result] = await Gasto.aggregate([
-    { $match: { categoria: normalizeCategoria(categoria), userId: objectUserId } },
+    {
+      $match: {
+        categoria: normalizeCategoria(categoria),
+        userId: objectUserId,
+        fecha: { $regex: `^${mesActual}` },
+      },
+    },
     { $group: { _id: null, total: { $sum: '$monto' } } },
   ]);
   return result?.total ?? 0;
@@ -1425,6 +1506,82 @@ app.delete(
     // Desvincular gastos
     await Gasto.updateMany({ userId, cuentaId: deleted._id }, { $set: { cuentaId: null } });
     res.json({ message: 'Eliminado' });
+  })
+);
+
+// --- Routes: Metas de Ahorro ---
+app.get(
+  '/api/metas',
+  asyncRoute(async (req, res) => {
+    const data = await MetaAhorro.find({ userId: req.auth.userId }).sort({ createdAt: -1 });
+    res.json({ data: toClientList(data) });
+  })
+);
+
+app.post(
+  '/api/metas',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    const payload = sanitizeMetaAhorroPayload(req.body);
+    const meta = await MetaAhorro.create({ ...payload, userId });
+    res.json({ data: toClientDoc(meta) });
+  })
+);
+
+app.put(
+  '/api/metas/:id',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    ensureObjectId(req.params.id, 'id');
+    const existing = await MetaAhorro.findOne({ _id: req.params.id, userId });
+    if (!existing) {
+      res.status(404).json({ message: 'No encontrado' });
+      return;
+    }
+
+    const updates = sanitizeMetaAhorroPayload(req.body, { partial: true });
+    Object.assign(existing, updates);
+    await existing.save();
+    res.json({ data: toClientDoc(existing) });
+  })
+);
+
+app.delete(
+  '/api/metas/:id',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    ensureObjectId(req.params.id, 'id');
+    const deleted = await MetaAhorro.findOneAndDelete({ _id: req.params.id, userId });
+    if (!deleted) {
+      res.status(404).json({ message: 'No encontrado' });
+      return;
+    }
+    res.json({ message: 'Eliminado' });
+  })
+);
+
+app.post(
+  '/api/metas/:id/aportes',
+  asyncRoute(async (req, res) => {
+    const userId = req.auth.userId;
+    ensureObjectId(req.params.id, 'id');
+    const aporte = sanitizeAportePayload(req.body);
+
+    const meta = await MetaAhorro.findOne({ _id: req.params.id, userId });
+    if (!meta) {
+      res.status(404).json({ message: 'No encontrado' });
+      return;
+    }
+
+    meta.aportes.push(aporte);
+    meta.montoActual = meta.aportes.reduce((acc, a) => acc + a.monto, 0);
+
+    if (meta.montoActual >= meta.montoObjetivo) {
+      meta.lograda = true;
+    }
+
+    await meta.save();
+    res.json({ data: toClientDoc(meta) });
   })
 );
 

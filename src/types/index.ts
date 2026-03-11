@@ -106,6 +106,26 @@ export interface Cuenta {
   userId?: string;
 }
 
+export interface Aporte {
+  id: string;
+  monto: number;
+  fecha: string;
+  notas?: string;
+}
+
+export interface MetaAhorro {
+  _id?: string;
+  id: string;
+  nombre: string;
+  montoObjetivo: number;
+  montoActual: number;
+  fechaLimite: string;
+  aportes: Aporte[];
+  lograda: boolean;
+  color: string;
+  userId?: string;
+}
+
 export interface Usuario {
   id: string;
   nombre: string;
@@ -180,6 +200,17 @@ export interface CuentasState {
   addCuenta: (cuenta: Omit<Cuenta, 'id' | 'saldoActual'>) => Promise<void>;
   updateCuenta: (id: string, updates: Partial<Cuenta>) => Promise<void>;
   deleteCuenta: (id: string) => Promise<void>;
+}
+
+export interface MetasState {
+  metas: MetaAhorro[];
+  loading: boolean;
+  error: string | null;
+  loadMetas: () => Promise<void>;
+  addMeta: (meta: Omit<MetaAhorro, 'id' | 'montoActual' | 'aportes' | 'lograda'>) => Promise<void>;
+  updateMeta: (id: string, updates: Partial<MetaAhorro>) => Promise<void>;
+  deleteMeta: (id: string) => Promise<void>;
+  addAporte: (id: string, aporte: Omit<Aporte, 'id'>) => Promise<void>;
 }
 
 // --- API response ---

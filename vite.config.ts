@@ -13,7 +13,7 @@ export default defineConfig({
     svgr(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['crown.svg', 'robots.txt'],
+      includeAssets: ['crown.svg', 'robots.txt', 'icons/png/*.png'],
       manifest: {
         name: 'Gastos App',
         short_name: 'GastosApp',
@@ -21,8 +21,24 @@ export default defineConfig({
         theme_color: '#100C08',
         background_color: '#100C08',
         display: 'standalone',
+        orientation: 'portrait',
         icons: [
-          { src: 'crown.svg', sizes: 'any', type: 'image/svg+xml' }
+          {
+            src: 'icons/png/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'icons/png/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'icons/png/maskable-icon.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
         ]
       }
     })

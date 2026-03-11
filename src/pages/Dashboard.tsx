@@ -1,4 +1,5 @@
-import { Wallet, TrendingUp, AlertTriangle, Target, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Wallet, TrendingUp, AlertTriangle, Target, Clock, X, Info } from 'lucide-react';
 import { Header } from '../components/layout/Header.tsx';
 import { Card } from '../components/ui/Card.tsx';
 import { DataState } from '../components/ui/DataState.tsx';
@@ -31,11 +32,43 @@ export function Dashboard() {
   const { formatCurrency, formatDate } = useFormatting();
   const alertas = useAlerts();
 
+  const [showBanner, setShowBanner] = useState(false);
+
+  useEffect(() => {
+    const today = new Date();
+    // Mostrar el banner los primeros 5 días del mes
+    if (today.getDate() <= 5) {
+      const dismissed = localStorage.getItem(`banner_dismissed_${today.getMonth()}_${today.getFullYear()}`);
+      if (!dismissed) {
+        setShowBanner(true);
+      }
+    }
+  }, []);
+
+  const handleDismissBanner = () => {
+    const today = new Date();
+    localStorage.setItem(`banner_dismissed_${today.getMonth()}_${today.getFullYear()}`, 'true');
+    setShowBanner(false);
+  };
+
   const totalMes = getTotalMes();
   const gastosRecientes = getGastosFiltrados().slice(0, 6);
   const totalPresupuestado = presupuestos.reduce((acc, presupuesto) => acc + presupuesto.montoLimite, 0);
   const excedidos = presupuestos.filter((presupuesto) => presupuesto.montoGastado >= presupuesto.montoLimite).length;
   const vencenProximos = alertas.filter((alerta) => alerta.tipo === 'vencimiento').length;
+
+  // Resumen del mes anterior
+  const now = new Date();
+  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const prevMonthKey = `${prevMonthDate.getFullYear()}-${String(prevMonthDate.getMonth() + 1).padStart(2, '0')}`;
+  
+  const totalMesAnterior = useGastosStore.getState().gastos
+    .filter(g => g.fecha.startsWith(prevMonthKey))
+    .reduce((acc, g) => acc + g.monto, 0);
+
+  const budgetPerformance = totalPresupuestado > 0 
+    ? (totalMesAnterior / totalPresupuestado) * 100 
+    : 0;
 
   const showInitialLoading = (
     (gastosLoading || presupuestosLoading || compartidosLoading)
@@ -49,6 +82,33 @@ export function Dashboard() {
   return (
     <>
       <Header title="El Gran Libro de Gastos" subtitle="Resumen del reino" />
+
+      {showBanner && (
+        <div className={styles.welcomeBanner}>
+          <button className={styles.closeBanner} onClick={handleDismissBanner} aria-label="Cerrar">
+            <X size={16} />
+          </button>
+          <h2 className={styles.welcomeTitle}>
+            <Info size={24} /> ¡Bienvenido al nuevo ciclo!
+          </h2>
+          <p className={styles.welcomeText}>
+            Comienza un nuevo mes en el Reino. Tus gastos se han reiniciado y es un buen momento
+            para revisar tus presupuestos y metas de ahorro.
+          </p>
+          <div className={styles.summaryRow}>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Gastado el mes pasado</span>
+              <span className={styles.summaryValue}>{formatCurrency(totalMesAnterior)}</span>
+            </div>
+            <div className={styles.summaryItem}>
+              <span className={styles.summaryLabel}>Rendimiento</span>
+              <span className={`${styles.summaryValue} ${budgetPerformance <= 100 ? styles.success : styles.danger}`}>
+                {budgetPerformance.toFixed(1)}% del presupuesto
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showInitialLoading && (
         <DataState

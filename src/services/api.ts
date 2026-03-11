@@ -5,6 +5,8 @@ import {
   type GastoCompartido,
   type Presupuesto,
   type Usuario,
+  type MetaAhorro,
+  type Aporte,
 } from '../types/index.ts';
 import { API_BASE_URL } from '../config/runtime.ts';
 export const TOKEN_STORAGE_KEY = 'got_token';
@@ -206,6 +208,41 @@ export const cuentasApi = {
 
   delete: async (id: string): Promise<ApiResponse<null>> =>
     request<ApiResponse<null>>(`/cuentas/${id}`, { method: 'DELETE' }),
+};
+
+// --- Metas de Ahorro ---
+export const metasApi = {
+  getAll: async (): Promise<ApiResponse<MetaAhorro[]>> => {
+    const res = await request<ApiResponse<MetaAhorro[]>>('/metas');
+    return { ...res, data: normalizeEntityList(res.data) };
+  },
+
+  create: async (data: Omit<MetaAhorro, 'id' | 'montoActual' | 'aportes' | 'lograda'>): Promise<ApiResponse<MetaAhorro>> => {
+    const res = await request<ApiResponse<MetaAhorro>>('/metas', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return { ...res, data: normalizeEntity(res.data) };
+  },
+
+  update: async (id: string, data: Partial<MetaAhorro>): Promise<ApiResponse<MetaAhorro>> => {
+    const res = await request<ApiResponse<MetaAhorro>>(`/metas/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return { ...res, data: normalizeEntity(res.data) };
+  },
+
+  delete: async (id: string): Promise<ApiResponse<null>> =>
+    request<ApiResponse<null>>(`/metas/${id}`, { method: 'DELETE' }),
+
+  addAporte: async (id: string, aporte: Omit<Aporte, 'id'>): Promise<ApiResponse<MetaAhorro>> => {
+    const res = await request<ApiResponse<MetaAhorro>>(`/metas/${id}/aportes`, {
+      method: 'POST',
+      body: JSON.stringify(aporte),
+    });
+    return { ...res, data: normalizeEntity(res.data) };
+  },
 };
 
 // --- Reportes ---

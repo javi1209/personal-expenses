@@ -17,6 +17,7 @@ import {
   usePreferencesStore,
 } from '../../store/preferencesStore.ts';
 import { useLayoutStore } from '../../store/layoutStore.ts';
+import { usePWAInstall } from '../../hooks/usePWAInstall.ts';
 import styles from './Sidebar.module.css';
 
 const NAV_ITEMS = [
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { to: '/gastos', icon: Wallet, label: 'Mis Gastos' },
   { to: '/categorias', icon: Tag, label: 'Categorías' },
   { to: '/presupuestos', icon: Target, label: 'Presupuestos' },
+  { to: '/metas', icon: Crown, label: 'Metas de Ahorro' },
   { to: '/compartidos', icon: Users, label: 'Compartidos' },
   { to: '/cuentas', icon: Landmark, label: 'Cuentas' },
   { to: '/reportes', icon: BarChart3, label: 'Reportes' },
@@ -44,6 +46,7 @@ export function Sidebar() {
   const setLocale = usePreferencesStore((s) => s.setLocale);
   const setCurrency = usePreferencesStore((s) => s.setCurrency);
   const setTheme = usePreferencesStore((s) => s.setTheme);
+  const { isInstallable, handleInstall } = usePWAInstall();
 
   return (
     <>
@@ -158,6 +161,18 @@ export function Sidebar() {
               </div>
             )}
           </div>
+          {isInstallable && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={styles.installBtn}
+              onClick={handleInstall}
+              type="button"
+            >
+              <Crown size={15} />
+              <span className={styles.installLabel}>Descargar App</span>
+            </motion.button>
+          )}
           <motion.button
             whileHover={{ backgroundColor: 'var(--got-red-dim)', color: 'var(--got-red-light)' }}
             whileTap={{ scale: 0.98 }}
