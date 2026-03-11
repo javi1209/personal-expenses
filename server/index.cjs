@@ -1634,6 +1634,15 @@ if (IS_PRODUCTION) {
   });
 }
 
+app.use((_req, res) => {
+  logger.info(`[404] Ruta no encontrada: ${_req.method} ${_req.url}`);
+  res.status(404).json({
+    message: 'Ruta no encontrada',
+    path: _req.url,
+    method: _req.method,
+  });
+});
+
 app.use((err, _req, res, next) => {
   if (!err) {
     next();
@@ -1641,6 +1650,8 @@ app.use((err, _req, res, next) => {
   }
 
   const message = err instanceof Error ? err.message : 'Error interno del servidor';
+  logger.error(`[Error Middleware] ${message}`, err, { path: _req.url, method: _req.method });
+  
   if (message === 'Origen no permitido por CORS') {
     res.status(403).json({ message });
     return;
