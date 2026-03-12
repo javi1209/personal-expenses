@@ -1623,16 +1623,8 @@ app.get(
   })
 );
 
-if (IS_PRODUCTION) {
-  const distPath = path.join(__dirname, '..', 'dist');
-  app.use(express.static(distPath));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) {
-      return next();
-    }
-    res.sendFile(path.join(distPath, 'index.html'));
-  });
-}
+// Redundant static serving block removed for Vercel deployment.
+// Vercel handles static assets and SPA routing via vercel.json.
 
 app.use((_req, res) => {
   logger.info(`[404] Ruta no encontrada: ${_req.method} ${_req.url}`);
