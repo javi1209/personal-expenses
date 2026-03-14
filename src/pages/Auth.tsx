@@ -109,6 +109,7 @@ export function Auth() {
               label="Nombre"
               placeholder="Tu nombre"
               value={nombre}
+              autoComplete="name"
               onChange={(event) => setNombre(event.target.value)}
             />
           )}
@@ -121,6 +122,7 @@ export function Auth() {
             type="email"
             placeholder="tu@email.com"
             value={email}
+            autoComplete="email"
             onChange={(event) => setEmail(event.target.value)}
           />
 
@@ -132,6 +134,7 @@ export function Auth() {
             type="password"
             placeholder="Minimo 8 caracteres"
             value={password}
+            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
             onChange={(event) => setPassword(event.target.value)}
           />
 

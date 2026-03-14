@@ -1623,35 +1623,6 @@ app.get(
   })
 );
 
-// Redundant static serving block removed for Vercel deployment.
-// Vercel handles static assets and SPA routing via vercel.json.
-
-app.use((_req, res) => {
-  logger.info(`[404] Ruta no encontrada: ${_req.method} ${_req.url}`);
-  res.status(404).json({
-    message: 'Ruta no encontrada',
-    path: _req.url,
-    method: _req.method,
-  });
-});
-
-app.use((err, _req, res, next) => {
-  if (!err) {
-    next();
-    return;
-  }
-
-  const message = err instanceof Error ? err.message : 'Error interno del servidor';
-  logger.error(`[Error Middleware] ${message}`, err, { path: _req.url, method: _req.method });
-  
-  if (message === 'Origen no permitido por CORS') {
-    res.status(403).json({ message });
-    return;
-  }
-
-  res.status(500).json({ message });
-});
-
 // --- Socket.io ---
 io.use((socket, next) => {
   try {
@@ -1793,6 +1764,35 @@ app.get(
     res.json({ data: logs });
   })
 );
+
+// Redundant static serving block removed for Vercel deployment.
+// Vercel handles static assets and SPA routing via vercel.json.
+
+app.use((_req, res) => {
+  logger.info(`[404] Ruta no encontrada: ${_req.method} ${_req.url}`);
+  res.status(404).json({
+    message: 'Ruta no encontrada',
+    path: _req.url,
+    method: _req.method,
+  });
+});
+
+app.use((err, _req, res, next) => {
+  if (!err) {
+    next();
+    return;
+  }
+
+  const message = err instanceof Error ? err.message : 'Error interno del servidor';
+  logger.error(`[Error Middleware] ${message}`, err, { path: _req.url, method: _req.method });
+  
+  if (message === 'Origen no permitido por CORS') {
+    res.status(403).json({ message });
+    return;
+  }
+
+  res.status(500).json({ message });
+});
 
 const syncPresupuestosOnBoot = async () => {
   try {
