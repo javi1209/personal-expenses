@@ -7,6 +7,9 @@ module.exports = async (req, res) => {
     const startTime = Date.now();
     console.log(`[Vercel API Logs] -> Request: ${req.method} ${req.url}`);
     console.log(`[Vercel API Logs] -> Headers:`, JSON.stringify(req.headers));
+    if (req.body && Object.keys(req.body).length > 0) {
+        console.log(`[Vercel API Logs] -> Body keys:`, Object.keys(req.body));
+    }
     
     if (!isConnected) {
         console.log("[Vercel API Logs] -> Intentando conectar a la base de datos...");

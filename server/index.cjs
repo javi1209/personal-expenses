@@ -165,6 +165,23 @@ app.use(
   })
 );
 
+// Middleware de diagnostico y normalizacion para Vercel
+app.use((req, res, next) => {
+  if (IS_PRODUCTION) {
+    console.log(`[Express Debug] -> Method: ${req.method} | URL: ${req.url} | BaseURL: ${req.baseUrl}`);
+  }
+  
+  // Si la ruta no empieza con /api pero deberia (comun en algunos despliegues de Vercel)
+  if (!req.url.startsWith('/api') && !req.url.includes('.')) {
+    const oldUrl = req.url;
+    req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
+    if (IS_PRODUCTION) {
+      console.log(`[Express Debug] -> Normalizando URL: ${oldUrl} => ${req.url}`);
+    }
+  }
+  next();
+});
+
 const logger = {
   info: (message, meta = {}) => {
     if (IS_PRODUCTION) {
@@ -1619,9 +1636,35 @@ app.get(
       Presupuesto: monthlyBudget,
     }));
 
-    res.json({ data: result });
+    res.json({ data: gastosPorMes });
   })
 );
+
+// --- Catch-all 404 para API ---
+app.use('/api/*', (req, res) => {
+  if (IS_PRODUCTION) {
+    console.warn(`[Express 404] -> Ruta API no encontrada: ${req.method} ${req.url}`);
+  }
+  res.status(404).json({
+    message: `Ruta API no encontrada: ${req.method} ${req.originalUrl || req.url}`,
+    tip: 'Verifica los logs de la funcion en Vercel para mas detalles.'
+  });
+});
+
+// --- Catch-all general ---
+app.use((req, res) => {
+  if (IS_PRODUCTION) {
+    console.warn(`[Express 404] -> Ruta no encontrada: ${req.method} ${req.url}`);
+  }
+  res.status(404).json({
+    message: `Ruta no encontrada: ${req.method} ${req.url}`,
+    debug: {
+      url: req.url,
+      method: req.method,
+      isProduction: IS_PRODUCTION
+    }
+  });
+});
 
 // --- Socket.io ---
 io.use((socket, next) => {
