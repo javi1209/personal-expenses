@@ -7,7 +7,7 @@ const rawBasePath = process.env.VITE_BASE_PATH?.trim()
 const basePath = rawBasePath ? `${rawBasePath.replace(/\/+$/, '')}/` : './'
 
 export default defineConfig({
-  base: basePath,
+  base: '/',
   plugins: [
     react(),
     svgr(),
