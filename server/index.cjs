@@ -167,19 +167,22 @@ app.use(
 
 // Middleware de diagnostico y normalizacion para Vercel
 app.use((req, res, next) => {
-  if (IS_PRODUCTION) {
-    console.log(`[Express Debug] -> Method: ${req.method} | URL: ${req.url} | BaseURL: ${req.baseUrl}`);
-  }
-  
-  // Si la ruta no empieza con /api pero deberia (comun en algunos despliegues de Vercel)
-  if (!req.url.startsWith('/api') && !req.url.includes('.')) {
+  if (IS_PRODUCTION && !req.url.startsWith('/api') && !req.url.includes('.')) {
     const oldUrl = req.url;
     req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
-    if (IS_PRODUCTION) {
-      console.log(`[Express Debug] -> Normalizando URL: ${oldUrl} => ${req.url}`);
-    }
+    console.log(`[Vercel Rewriter] -> Normalizando: ${oldUrl} => ${req.url}`);
   }
   next();
+});
+
+// Endpoint de salud para Vercel
+app.get('/api/ping', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: NODE_ENV,
+    url: req.url
+  });
 });
 
 const logger = {
