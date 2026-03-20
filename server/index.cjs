@@ -56,10 +56,7 @@ const isDevLoopbackOrigin = (origin) => {
   }
 };
 
-const corsOriginList = readEnv('CORS_ORIGIN', {
-  defaultValue: DEV_DEFAULT_CORS_ORIGINS,
-  requiredInProduction: true,
-})
+const corsOriginList = (readEnv('CORS_ORIGIN') ?? '*')
   .split(',')
   .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
@@ -70,7 +67,7 @@ if (corsOriginList.length === 0) {
 
 const allowedOrigins = new Set(corsOriginList);
 const corsOriginHandler = (origin, callback) => {
-  if (!origin || allowedOrigins.has(normalizeOrigin(origin)) || isDevLoopbackOrigin(origin)) {
+  if (!origin || allowedOrigins.has('*') || allowedOrigins.has(normalizeOrigin(origin)) || isDevLoopbackOrigin(origin)) {
     callback(null, true);
     return;
   }
