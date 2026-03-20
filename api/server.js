@@ -6,6 +6,9 @@ let isConnected = false;
 export default async (req, res) => {
     const startTime = Date.now();
     console.log(`[Vercel Server] -> Request: ${req.method} ${req.url}`);
+    console.log(`[Vercel Server] -> Original URL: ${req.originalUrl || 'N/A'}`);
+    console.log(`[Vercel Server] -> Base URL: ${req.baseUrl || 'N/A'}`);
+    console.log(`[Vercel Server] -> Host: ${req.headers.host}`);
     
     if (!isConnected) {
         console.log("[Vercel Server] -> Intentando conectar a la base de datos...");

@@ -167,21 +167,29 @@ app.use(
 
 // Middleware de diagnostico y normalizacion para Vercel
 app.use((req, res, next) => {
-  if (IS_PRODUCTION && !req.url.startsWith('/api') && !req.url.includes('.')) {
+  const isApiRequest = req.url.startsWith('/api/');
+  const isStaticFile = req.url.includes('.');
+  
+  if (IS_PRODUCTION && !isApiRequest && !isStaticFile) {
     const oldUrl = req.url;
+    // Si la ruta no empieza por /api/ y no parece un archivo estatico, 
+    // la normalizamos para que Express la encuentre bajo /api
     req.url = '/api' + (req.url.startsWith('/') ? '' : '/') + req.url;
     console.log(`[Vercel Rewriter] -> Normalizando: ${oldUrl} => ${req.url}`);
   }
   next();
 });
 
+
 // Endpoint de salud para Vercel
 app.get('/api/ping', (req, res) => {
+  console.log(`[Express API] -> Ping recibido en: ${req.url}`);
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
     env: NODE_ENV,
-    url: req.url
+    url: req.url,
+    originalUrl: req.originalUrl
   });
 });
 
@@ -1639,35 +1647,11 @@ app.get(
       Presupuesto: monthlyBudget,
     }));
 
-    res.json({ data: gastosPorMes });
+    res.json({ data: result });
   })
 );
 
-// --- Catch-all 404 para API ---
-app.use('/api/*', (req, res) => {
-  if (IS_PRODUCTION) {
-    console.warn(`[Express 404] -> Ruta API no encontrada: ${req.method} ${req.url}`);
-  }
-  res.status(404).json({
-    message: `Ruta API no encontrada: ${req.method} ${req.originalUrl || req.url}`,
-    tip: 'Verifica los logs de la funcion en Vercel para mas detalles.'
-  });
-});
-
-// --- Catch-all general ---
-app.use((req, res) => {
-  if (IS_PRODUCTION) {
-    console.warn(`[Express 404] -> Ruta no encontrada: ${req.method} ${req.url}`);
-  }
-  res.status(404).json({
-    message: `Ruta no encontrada: ${req.method} ${req.url}`,
-    debug: {
-      url: req.url,
-      method: req.method,
-      isProduction: IS_PRODUCTION
-    }
-  });
-});
+// --- WebSocket (Socket.IO) handling ---
 
 // --- Socket.io ---
 io.use((socket, next) => {
@@ -1811,16 +1795,26 @@ app.get(
   })
 );
 
-// Redundant static serving block removed for Vercel deployment.
-// Vercel handles static assets and SPA routing via vercel.json.
+// --- Error and 404 Handlers ---
 
-app.use((_req, res) => {
-  logger.info(`[404] Ruta no encontrada: ${_req.method} ${_req.url}`);
+// Catch-all 404 for API
+app.use('/api', (req, res) => {
+  if (IS_PRODUCTION) {
+    console.warn(`[Express API] !! 404 No encontrado: ${req.method} ${req.url}`);
+  }
   res.status(404).json({
-    message: 'Ruta no encontrada',
-    path: _req.url,
-    method: _req.method,
+    message: `Ruta API no encontrada: ${req.method} ${req.url}`,
+    path: req.url,
+    method: req.method
   });
+});
+
+// Catch-all general 404
+app.use((req, res) => {
+  if (IS_PRODUCTION) {
+    console.warn(`[Express 404] -> Ruta no encontrada: ${req.method} ${req.url}`);
+  }
+  res.status(404).json({ message: 'No encontrado' });
 });
 
 app.use((err, _req, res, next) => {

@@ -11,11 +11,11 @@
   "rewrites": [
     {
       "source": "/api/ping",
-      "destination": "/api/server.js"
+      "destination": "/api/server"
     },
     {
       "source": "/api/:path*",
-      "destination": "/api/server.js"
+      "destination": "/api/server"
     },
     {
       "source": "/((?!api/).*)",
